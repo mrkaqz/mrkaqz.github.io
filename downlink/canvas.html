@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<header>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        }
+        canvas {
+          border: 2px solid rgb(88, 87, 87);
+          display: inline-block;
+          align-self: center;
+        }
+
+      </style>
+    <script>
+        var beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5, 13];
+    </script>
+    
+
+</header>
+<body>
+    <div align="center">
+        <canvas id="canvas"></canvas>
+    </div>
+    <script>
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.width  = 540;
+        canvas.height = 100;
+
+
+        function drawLine() {
+        var h = 0;
+        var l = 0;
+        function drawupdown(s0,s1,s2) {
+            h = l + (s1-s0)*40
+            l = h + (s2-s1)*40
+            
+            ctx.lineTo(h, 20); // H
+            ctx.lineTo(h, 80); // H>L
+            ctx.lineTo(l, 80); // L
+            ctx.lineTo(l, 20); // L>H
+            
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.moveTo(0, 20); // Starting point
+        drawupdown(0,beepSq[0],beepSq[1]) // draw first line
+
+        for (let i = 1; i < beepSq.length-1; i = i+2) {
+            drawupdown(beepSq[i],beepSq[i+1],beepSq[i+2]);
+        }
+        ctx.lineTo(540, 20); // Draw end line
+        ctx.stroke();
+        }
+
+        var x = 50;
+        // Draw the circle on the canvas
+        function drawCircle() {
+        // Clear the canvas
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the circle
+        ctx.beginPath();
+        ctx.arc(x, 20, 5, 0, Math.PI * 2);
+        ctx.fillStyle = "orange";
+        ctx.fill();
+        ctx.closePath();
+        }
+        
+        function moveCircle() {
+            x += 2;
+            drawCircle();
+        }
+
+        setInterval( () => {drawLine();moveCircle();}, 100);
+
+      </script>
+</body>
+</html>

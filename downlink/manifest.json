@@ -1,0 +1,49 @@
+{
+    "dir": "ltr",
+    "lang": "en",
+    "name": "PowerDrive Downlink Tool",
+    "short_name": "Downlink",
+    "scope": "/downlink/",
+    "display": "standalone",
+    "start_url": "https://ronnarong.dev/downlink/",
+    "background_color": "#000000",
+    "theme_color": "transparent",
+    "description": "Downlink Application for Schlumberger PowerDrive Rotary Steerable Tools on a mobile device.",
+    "orientation": "portrait",
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icon-72.png",
+            "type": "image/png", 
+            "sizes": "72x72"
+          },
+          {
+            "src": "icon-96.png",
+            "type": "image/png",
+            "sizes": "96x96"
+          },
+          {
+            "src": "icon-128.png",
+            "type": "image/png",
+            "sizes": "128x128"
+          },
+          {
+            "src": "icon-256.png",
+            "type": "image/png",
+            "sizes": "256x256"
+          },
+          {
+            "src": "icon-512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+          }
+    ],
+    "url": "https://ronnarong.dev/downlink/",
+    "features": [
+        "Works on Android/iOS/PC/Mac",
+        "Works offline without internet",
+        "Clean, fast and simple interface",
+        "3 Beep alert sound before change"
+      ]
+}
