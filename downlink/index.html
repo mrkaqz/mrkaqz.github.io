@@ -18,6 +18,7 @@
         };
     </script>
     <style>
+        /* BASIC STYLING RESET */
         * {
             box-sizing: border-box;
         }
@@ -25,7 +26,6 @@
             font-family: Arial;
             margin: 0 !important;
             padding: 0 !important;
-
         }
         h1,p {
             margin-top: 10px;
@@ -33,9 +33,9 @@
             margin-right: 1px;
             margin-left: 1px;
         }
+        /* BUTTON STYLES */
         .button {
-            background-color: #4CAF50;
-            /* Green */
+            background-color: #4CAF50; /* Green */
             border: none;
             color: white;
             padding: 15px 32px;
@@ -45,25 +45,19 @@
             font-size: 16px;
         }
         .button:disabled {
-            background-color: #707471;
-            /* Green */
+            background-color: #707471; /* Grey when disabled */
         }
-        .bigfont {
-            font-size: 10vw; 
-        }
-        .midfont {
-            font-size: 5vw; 
-        }
-        .smallfont {
-            font-size: 3vw; 
-        }
-        .tinyfont {
-            font-size: 1vw; 
-        }
+        /* RESPONSIVE FONT SIZES */
+        .bigfont { font-size: 10vw; }
+        .midfont { font-size: 5vw; }
+        .smallfont { font-size: 3vw; }
+        .tinyfont { font-size: 1vw; }
+        
         img {
             max-width: 80%;
             height: auto;
         }
+        /* CANVAS BORDER */
         canvas {
           border: 2px solid rgb(88, 87, 87);
           display: block;
@@ -81,15 +75,17 @@
         </tr>
     </table>
 </div>
+
 <div  align="center">
-<h1 id="state" class="bigfont">BEGIN</h1>
-<div align="center"><canvas id="canvas"></canvas></div>
-<p id="display" class="midfont">00:00:00</p>
-<p id="countdown" class="midfont">START TO BEGIN</p>
-<button id="startButton" class="button">START</button>
-<button id="stopButton" class="button">STOP</button>
+    <h1 id="state" class="bigfont">BEGIN</h1>
+    <div align="center"><canvas id="canvas"></canvas></div>
+    <p id="display" class="midfont">00:00:00</p>
+    <p id="countdown" class="midfont">START TO BEGIN</p>
+    <button id="startButton" class="button">START</button>
+    <button id="stopButton" class="button">STOP</button>
 </div>
 <br>
+
 <div align="center">
     <label class="smallfont">BIT PERIOD : </label>
     <select id="bitSelect" class="smallfont" onchange="cmdUpdate()">
@@ -103,7 +99,7 @@
     <label class="smallfont">COMMAND : </label>
     <select id="cmdSelect" class="smallfont" onchange="cmdUpdate();">
         <option value="0-0" selected="selected">Select Command</option>
-        <option value="1-0" align="center" align="center">1-0</option>
+        <option value="1-0" align="center">1-0</option>
         <option value="1-1" align="center">1-1</option>
         <option value="1-2" align="center">1-2</option>
         <option value="1-3" align="center">1-3</option>
@@ -167,349 +163,395 @@
         <option value="2-29" align="center">2-29</option>
         <option value="2-30" align="center">2-30</option>
         <option value="2-31" align="center">2-31</option>
-        <default>
-            <option value="0-0" selected="selected">Select Command</option>
-        </default>
     </select>
 </div>
 
-        <script>
-            var startTime, elapsedTime = 0;
-            var bitPreiod = 18;
-            var timerInterval;
-            var beepTimes = [5,10,15];
-            var beepSq = [];
-            var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            var beepFrequency = 1200; 
-            var shortBeepDuration = 200; 
-            var longBeepDuration = 800; 
-            var endInterval = beepTimes[beepTimes.length - 1]*1000
-            var wakeLock = null;
-            var windowWidth = window.innerWidth;
-            var plotWidth = windowWidth*0.8; 
-            var dotX = 0; 
-            var dotY = 20.5; 
-            var cmd = document.getElementById("cmdSelect").value;
+    <script>
+        // --- GLOBAL VARIABLES ---
+        var startTime, elapsedTime = 0;
+        var bitPreiod = 18;
+        var timerInterval;
+        var beepTimes = [5,10,15]; // Stores the trigger times for beeps
+        var beepSq = []; // Stores the command sequence values
+        
+        // Audio Setup
+        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        var beepFrequency = 1200; 
+        var shortBeepDuration = 200; 
+        var longBeepDuration = 800; 
+        
+        var endInterval = beepTimes[beepTimes.length - 1]*1000;
+        var wakeLock = null; // For keeping screen awake
+        
+        // Canvas/Drawing Setup
+        var windowWidth = window.innerWidth;
+        var plotWidth = windowWidth*0.8; 
+        var dotX = 0; 
+        var dotY = 20.5; 
+        var cmd = document.getElementById("cmdSelect").value;
+        
+        // Throttle Variable: Ensures we only beep once per second during countdown
+        var lastProcessedSecond = -1;
 
-            function startTimer() {
-                // Audio Context Resume fix for Chrome/Android
-                if (audioContext.state === 'suspended') {
-                    audioContext.resume();
-                }
+        // --- TIMER FUNCTIONS ---
 
-                if (document.getElementById("cmdSelect").value != "0-0") {  
-                    startTime = Date.now() - elapsedTime;
-                    // Run logic more frequently (100ms) to catch time changes accurately
-                    timerInterval = setInterval(updateTimer, 100); 
-                    
-                    document.getElementById("state").textContent = "HIGH";
-                    document.getElementById("startButton").disabled = true;
-                    document.getElementById("bitSelect").disabled = true;
-                    document.getElementById("cmdSelect").disabled = true;
-                    safePlayBeep(shortBeepDuration);
-                    dotX = 0;
-                    dotY = 20.5;
-                    drawLine();
-                }
+        function startTimer() {
+            // FIX: Resume AudioContext. Browsers block audio until user interaction.
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
             }
-    
-            function stopTimer() {
-                clearInterval(timerInterval);
-                document.getElementById("display").textContent = "00:00:00";
-                document.getElementById("countdown").textContent = "START TO BEGIN";
-                document.getElementById("state").innerHTML = "END"
-                document.getElementById("progressTable").style.width = "0%";
-                document.getElementById("startButton").disabled = false;
-                document.getElementById("bitSelect").disabled = false;
-                document.getElementById("cmdSelect").disabled = false;
-                elapsedTime = 0; 
-                cmdUpdate(); 
-            }
-            
 
-            function updateTimer() {
-                var currentTime = Date.now();
-                elapsedTime = currentTime - startTime;
-
-                // --- 1. OVERTIME CHECK (Prevents infinite count) ---
-                if (elapsedTime >= endInterval) {
-                    var postTime = elapsedTime - endInterval;
-                    document.getElementById("display").textContent = formatTime(postTime);
-                    document.getElementById("countdown").textContent = "TIME SINCE COMPLETE";
-                    document.getElementById("state").innerHTML = "DONE";
-                    document.getElementById("progressTable").style.width = "100%";
-                    return; 
-                }
-
-                // Update Main Timer Display
-                var formattedTime = formatTime(elapsedTime);
-                document.getElementById("display").textContent = formattedTime;
-                progressUpdate();
+            if (document.getElementById("cmdSelect").value != "0-0") {  
+                startTime = Date.now() - elapsedTime;
                 
-                // --- 2. CATCH-UP LOGIC (Fixes "Stuck" and "Minus" bugs) ---
-                if (beepTimes.length > 0) {
-                    var currentSeconds = Math.floor(elapsedTime / 1000);
-                    
-                    // While loop handles screen-off lag (skipping multiple beeps)
-                    // We check if the target time is in the past (<= currentSeconds)
-                    while (beepTimes.length > 0 && beepTimes[0] <= currentSeconds) {
-                        safePlayBeep(longBeepDuration);
-                        toggle();
-                        beepTimes.shift(); // Remove the passed time
-                    }
+                // Reset throttle tracker
+                lastProcessedSecond = -1; 
+                
+                // UPDATE RATE: 100ms (10 times/sec). 
+                // This is faster than 1000ms to ensure we catch the '0' moment accurately,
+                // avoiding the "missed beep" bug if the browser lags.
+                timerInterval = setInterval(updateTimer, 100); 
+                
+                // Lock UI elements
+                document.getElementById("state").textContent = "HIGH";
+                document.getElementById("startButton").disabled = true;
+                document.getElementById("bitSelect").disabled = true;
+                document.getElementById("cmdSelect").disabled = true;
+                
+                // Initial beep and draw
+                safePlayBeep(shortBeepDuration);
+                dotX = 0;
+                dotY = 20.5;
+                drawLine();
+            }
+        }
 
-                    // --- 3. DISPLAY NEXT COUNTDOWN ---
+        function stopTimer() {
+            clearInterval(timerInterval);
+            
+            // Reset UI
+            document.getElementById("display").textContent = "00:00:00";
+            document.getElementById("countdown").textContent = "START TO BEGIN";
+            document.getElementById("state").innerHTML = "END";
+            document.getElementById("progressTable").style.width = "0%";
+            
+            // Unlock UI elements
+            document.getElementById("startButton").disabled = false;
+            document.getElementById("bitSelect").disabled = false;
+            document.getElementById("cmdSelect").disabled = false;
+            
+            // Reset Internal Logic
+            elapsedTime = 0; 
+            lastProcessedSecond = -1;
+            cmdUpdate(); 
+        }
+        
+        // --- MAIN LOOP (Runs every 100ms) ---
+        function updateTimer() {
+            var currentTime = Date.now();
+            elapsedTime = currentTime - startTime;
+
+            // 1. OVERTIME CHECK (After sequence ends)
+            // If elapsed time is greater than the total sequence time
+            if (elapsedTime >= endInterval) {
+                var postTime = elapsedTime - endInterval;
+                document.getElementById("display").textContent = formatTime(postTime);
+                document.getElementById("countdown").textContent = "TIME SINCE COMPLETE";
+                document.getElementById("state").innerHTML = "DONE";
+                document.getElementById("progressTable").style.width = "100%";
+                return; // Stop processing the rest of the function
+            }
+
+            // 2. STANDARD DISPLAY UPDATE
+            var formattedTime = formatTime(elapsedTime);
+            document.getElementById("display").textContent = formattedTime;
+            progressUpdate();
+            
+            // 3. SEQUENCE & BEEP LOGIC
+            if (beepTimes.length > 0) {
+                var currentSeconds = Math.floor(elapsedTime / 1000);
+                
+                // A. CATCH-UP LOGIC (Fixes "Stuck" and "Minus" bugs)
+                // If the browser slept and woke up late, currentSeconds might be > beepTime.
+                // The 'while' loop skips past any events we missed while asleep.
+                while (beepTimes.length > 0 && beepTimes[0] <= currentSeconds) {
+                    safePlayBeep(longBeepDuration); // Play change sound
+                    toggle(); // Switch High/Low state
+                    beepTimes.shift(); // Remove the finished step from array
+                }
+
+                // B. COUNTDOWN LOGIC (3, 2, 1)
+                // logic: check if we have entered a NEW second to prevent rapid-fire beeping
+                // because this function runs 10x per second.
+                if (currentSeconds > lastProcessedSecond) {
+                    lastProcessedSecond = currentSeconds;
+                    
                     if (beepTimes.length > 0) {
                         var nextTarget = beepTimes[0];
                         var diff = nextTarget - currentSeconds;
 
+                        // Only beep if time remaining is 3, 2, or 1
                         if (diff <= 3 && diff > 0) {
-                             // Only beep short if we haven't just switched
-                             // Using a modulo check to prevent rapid fire beeping isn't needed 
-                             // if we rely on the 1-second ticks of 'diff' changing
-                             safePlayBeep(shortBeepDuration);
+                            safePlayBeep(shortBeepDuration);
                         }
                         
-                        // Because of the 'while' loop above, diff will always be positive here
                         document.getElementById("countdown").textContent = "CHANGE IN " + diff + " SEC";
-                    } else {
-                         // Should not happen due to Overtime check, but safe fallback
-                         document.getElementById("countdown").textContent = "WAITING...";
                     }
                 }
-                
-                drawLine();
-                moveCircle();
             }
-    
-            function formatTime(sec) {
-                var hours = Math.floor(sec / (1000 * 60 * 60));
-                var minutes = Math.floor((sec % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((sec % (1000 * 60)) / 1000);
-    
-                return (
-                    (hours < 10 ? "0" : "") + hours + ":" +
-                    (minutes < 10 ? "0" : "") + minutes + ":" +
-                    (seconds < 10 ? "0" : "") + seconds
-                );
+            
+            // 4. ANIMATION UPDATE
+            drawLine(); // Keep the lines drawn
+            moveCircle(); // Move the orange dot
+        }
+
+        // Helper: Formats milliseconds into HH:MM:SS
+        function formatTime(sec) {
+            var hours = Math.floor(sec / (1000 * 60 * 60));
+            var minutes = Math.floor((sec % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((sec % (1000 * 60)) / 1000);
+
+            return (
+                (hours < 10 ? "0" : "") + hours + ":" +
+                (minutes < 10 ? "0" : "") + minutes + ":" +
+                (seconds < 10 ? "0" : "") + seconds
+            );
+        }
+
+        // Helper: Wrapper to prevent audio crashes
+        // Some browsers throw errors if AudioContext is not ready.
+        function safePlayBeep(duration) {
+            try {
+                var oscillator = audioContext.createOscillator();
+                oscillator.frequency.value = beepFrequency;
+                oscillator.connect(audioContext.destination);
+                oscillator.start();
+                setTimeout(function() {
+                    oscillator.stop();
+                }, duration);
+            } catch (e) {
+                console.error("Audio play failed", e);
             }
-    
-            // Wrapper to prevent audio crashes from stopping the timer
-            function safePlayBeep(duration) {
+        }
+
+        // Helper: Toggles High/Low text and Y position for graph
+        function toggle() {
+            if (document.getElementById("state").innerHTML == "HIGH" ) {
+                document.getElementById("state").innerHTML = "LOW"
+                dotY = 80.5;
+            } else if (document.getElementById("state").innerHTML == "LOW") {
+                document.getElementById("state").innerHTML = "HIGH"
+                dotY = 20.5;
+            }
+        }
+
+        function progressUpdate() {
+            document.getElementById("progressTable").style.width = (elapsedTime/endInterval)*100 + "%";
+        }
+
+        // --- WAKE LOCK API (Keeps screen on on mobile) ---
+        if ('wakeLock' in navigator) {
+            console.log("Wake lock is supported")
+            async function requestWakeLock() {
                 try {
-                    var oscillator = audioContext.createOscillator();
-                    oscillator.frequency.value = beepFrequency;
-                    oscillator.connect(audioContext.destination);
-                    oscillator.start();
-                    setTimeout(function() {
-                        oscillator.stop();
-                    }, duration);
-                } catch (e) {
-                    console.error("Audio play failed", e);
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake lock activated.');
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
                 }
             }
-    
-            function toggle() {
-                if (document.getElementById("state").innerHTML == "HIGH" ) {
-                    document.getElementById("state").innerHTML = "LOW"
-                    dotY = 80.5;
-                } else if (document.getElementById("state").innerHTML == "LOW") {
-                    document.getElementById("state").innerHTML = "HIGH"
-                    dotY = 20.5;
+            function releaseWakeLock() {
+                if (wakeLock !== null) {
+                    wakeLock.release();
+                    wakeLock = null;
+                    console.log('Wake lock released.');
                 }
             }
-    
-            function progressUpdate() {
-                document.getElementById("progressTable").style.width = (elapsedTime/endInterval)*100 + "%";
-            }
-
-            if ('wakeLock' in navigator) {
-                console.log("Wake lock is supported")
-                async function requestWakeLock() {
-                    try {
-                        wakeLock = await navigator.wakeLock.request('screen');
-                        console.log('Wake lock activated.');
-                    } catch (err) {
-                        console.error(`${err.name}, ${err.message}`);
-                    }
-                }
-                function releaseWakeLock() {
-                    if (wakeLock !== null) {
-                        wakeLock.release();
-                        wakeLock = null;
-                        console.log('Wake lock released.');
-                    }
-                }
+            requestWakeLock();
+            // Re-acquire lock if user switches tabs and comes back
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && wakeLock === null) {
                 requestWakeLock();
-                document.addEventListener('visibilitychange', () => {
-                    if (document.visibilityState === 'visible' && wakeLock === null) {
-                    requestWakeLock();
-                    } else if (document.visibilityState === 'hidden' && wakeLock !== null) {
-                    releaseWakeLock();
-                    }
-                });
-            } else {
-                console.log("Wake lock is not supported")
-            }
-
-            var canvas = document.getElementById('canvas');
-            var ctx = canvas.getContext('2d');
-            canvas.width  = plotWidth+20;
-            canvas.height = 100;
-
-            function drawLine() {
-                var h = 0;
-                var l = 0;
-                function drawupdown(s0,s1,s2) {
-                    h = l + (s1-s0)*(plotWidth/beepSq[beepSq.length-1])
-                    l = h + (s2-s1)*(plotWidth/beepSq[beepSq.length-1])
-                    ctx.lineTo(h+0.5, 20.5); 
-                    ctx.lineTo(h+0.5, 80.5); 
-                    ctx.lineTo(l-0.5, 80.5); 
-                    ctx.lineTo(l-0.5, 20.5); 
+                } else if (document.visibilityState === 'hidden' && wakeLock !== null) {
+                releaseWakeLock();
                 }
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.beginPath();
-                ctx.moveTo(0, 20.5); 
-                if (beepSq.length > 1) { 
-                    drawupdown(0,beepSq[0],beepSq[1]) 
-                    for (let i = 1; i < beepSq.length-1; i = i+2) {
-                        drawupdown(beepSq[i],beepSq[i+1],beepSq[i+2]);
-                    }
-                }
-                ctx.lineTo(plotWidth+20.5, 20.5); 
-                ctx.stroke();
-            }
-
-            function drawCircle() {
-                ctx.beginPath();
-                ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
-                ctx.fillStyle = "orange";
-                ctx.fill();
-                ctx.closePath();
-            }
-
-            function moveCircle() {
-                if (beepSq.length > 0) {
-                    // Calculate total duration of the sequence in milliseconds
-                    var totalDuration = beepSq[beepSq.length-1] * bitPreiod * 1000;
-                    
-                    // Calculate percentage of time passed (0.0 to 1.0)
-                    var progress = elapsedTime / totalDuration;
-
-                    // Set X position based on progress
-                    dotX = progress * plotWidth;
-                    
-                    // Prevent dot from going past the end
-                    if (dotX > plotWidth) dotX = plotWidth;
-
-                    drawCircle();
-                }
-            }
-
-            function cmdUpdate() {
-                cmd = document.getElementById("cmdSelect").value;
-                bitPreiod = parseInt(document.getElementById("bitSelect").value);
-    
-                switch (cmd) {
-                case "1-0": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5]; break; 
-                case "1-1": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
-                case "1-2": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
-                case "1-3": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
-                case "1-4": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-                case "1-5": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5]; break;  
-                case "1-6": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5]; break;  
-                case "1-7": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
-                case "1-8": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-                case "1-9": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
-                case "1-10": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5]; break;  
-                case "1-11": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
-                case "1-12": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5]; break;  
-                case "1-13": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5, 13]; break;  
-                case "1-14": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
-                case "1-15": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
-                case "1-16": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-                case "1-17": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
-                case "1-18": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5]; break;  
-                case "1-19": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
-                case "1-20": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5]; break;  
-                case "1-21": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13]; break;  
-                case "1-22": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
-                case "1-23": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
-                case "1-24": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
-                case "1-25": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
-                case "1-26": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
-                case "1-27": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
-                case "1-28": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-                case "1-29": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5]; break;  
-                case "1-30": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5]; break;  
-                case "1-31": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
-                case "2-0": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
-                case "2-1": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
-                case "2-2": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
-                case "2-3": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
-                case "2-4": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-                case "2-5": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5]; break;  
-                case "2-6": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5]; break;  
-                case "2-7": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
-                case "2-8": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-                case "2-9": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
-                case "2-10": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5]; break;  
-                case "2-11": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
-                case "2-12": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5]; break;  
-                case "2-13": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5, 13]; break;  
-                case "2-14": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
-                case "2-15": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
-                case "2-16": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-                case "2-17": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
-                case "2-18": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5]; break;  
-                case "2-19": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
-                case "2-20": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5]; break;  
-                case "2-21": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13]; break;  
-                case "2-22": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
-                case "2-23": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
-                case "2-24": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
-                case "2-25": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
-                case "2-26": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
-                case "2-27": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
-                case "2-28": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-                case "2-29": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5]; break;  
-                case "2-30": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5]; break;  
-                case "2-31": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
-                default: beepSq = [0]; break;
-                }
-                beepTimes = beepSq.map((element) => element * bitPreiod);
-                endInterval = beepTimes[beepTimes.length - 1]*1000 + 1000;
-                console.log(beepTimes);
-                
-                if (cmd != "0-0") {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    drawLine();
-                }
-            }
-
-            document.getElementById("startButton").addEventListener("click", startTimer);
-            document.getElementById("stopButton").addEventListener("click", stopTimer);
-
-            window.addEventListener('resize', function() {
-                var windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-                windowWidth = window.innerWidth;
-                plotWidth = windowWidth*0.8;
-                console.log(plotWidth);
-                canvas.width  = plotWidth+20;
             });
-        </script>
-    <div align="center">
-        <br>
-    <img src="PD-Map.webp" class="img-fluid">
-    </div>
+        } else {
+            console.log("Wake lock is not supported")
+        }
 
-    <div align="center">
-        <pwa-install></pwa-install>
-    </div>
-    <div align="center">
-        <br>
-        <p class="tinyfont">by https://ronnarong.dev <br>Version 3.1.3 - 20-Jan-26</p>
-    </div>
+        // --- CANVAS DRAWING ---
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.width  = plotWidth+20;
+        canvas.height = 100;
+
+        function drawLine() {
+            var h = 0;
+            var l = 0;
+            // Function to draw a single High/Low segment
+            function drawupdown(s0,s1,s2) {
+                h = l + (s1-s0)*(plotWidth/beepSq[beepSq.length-1])
+                l = h + (s2-s1)*(plotWidth/beepSq[beepSq.length-1])
+                ctx.lineTo(h+0.5, 20.5); 
+                ctx.lineTo(h+0.5, 80.5); 
+                ctx.lineTo(l-0.5, 80.5); 
+                ctx.lineTo(l-0.5, 20.5); 
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(0, 20.5); 
+            // Loop through sequence array and draw
+            if (beepSq.length > 1) { 
+                drawupdown(0,beepSq[0],beepSq[1]) 
+                for (let i = 1; i < beepSq.length-1; i = i+2) {
+                    drawupdown(beepSq[i],beepSq[i+1],beepSq[i+2]);
+                }
+            }
+            ctx.lineTo(plotWidth+20.5, 20.5); 
+            ctx.stroke();
+        }
+
+        function drawCircle() {
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
+            ctx.fillStyle = "orange";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // SMOOTH DOT MOVEMENT
+        // Calculates position based on percentage of total time (0.0 to 1.0)
+        // This ensures smoothness regardless of update frequency (10fps)
+        function moveCircle() {
+            if (beepSq.length > 0) {
+                // Calculate total duration of the sequence in milliseconds
+                var totalDuration = beepSq[beepSq.length-1] * bitPreiod * 1000;
+                
+                // Calculate percentage
+                var progress = elapsedTime / totalDuration;
+
+                // Set X position
+                dotX = progress * plotWidth;
+                
+                // Prevent dot from going past the end
+                if (dotX > plotWidth) dotX = plotWidth;
+
+                drawCircle();
+            }
+        }
+
+        // --- COMMAND SEQUENCES ---
+        // Updates the beepSq array based on the dropdown selection
+        function cmdUpdate() {
+            cmd = document.getElementById("cmdSelect").value;
+            bitPreiod = parseInt(document.getElementById("bitSelect").value);
+
+            switch (cmd) {
+            case "1-0": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5]; break; 
+            case "1-1": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
+            case "1-2": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
+            case "1-3": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
+            case "1-4": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+            case "1-5": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5]; break;  
+            case "1-6": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5]; break;  
+            case "1-7": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
+            case "1-8": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+            case "1-9": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
+            case "1-10": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5]; break;  
+            case "1-11": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
+            case "1-12": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5]; break;  
+            case "1-13": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5, 13]; break;  
+            case "1-14": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
+            case "1-15": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
+            case "1-16": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+            case "1-17": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
+            case "1-18": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5]; break;  
+            case "1-19": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
+            case "1-20": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5]; break;  
+            case "1-21": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13]; break;  
+            case "1-22": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
+            case "1-23": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
+            case "1-24": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
+            case "1-25": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
+            case "1-26": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
+            case "1-27": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
+            case "1-28": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+            case "1-29": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5]; break;  
+            case "1-30": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5]; break;  
+            case "1-31": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
+            case "2-0": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
+            case "2-1": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
+            case "2-2": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
+            case "2-3": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
+            case "2-4": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+            case "2-5": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5]; break;  
+            case "2-6": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5]; break;  
+            case "2-7": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
+            case "2-8": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+            case "2-9": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
+            case "2-10": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5]; break;  
+            case "2-11": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
+            case "2-12": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5]; break;  
+            case "2-13": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5, 13]; break;  
+            case "2-14": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
+            case "2-15": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
+            case "2-16": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+            case "2-17": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
+            case "2-18": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5]; break;  
+            case "2-19": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
+            case "2-20": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5]; break;  
+            case "2-21": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13]; break;  
+            case "2-22": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
+            case "2-23": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
+            case "2-24": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
+            case "2-25": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
+            case "2-26": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
+            case "2-27": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
+            case "2-28": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+            case "2-29": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5]; break;  
+            case "2-30": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5]; break;  
+            case "2-31": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
+            default: beepSq = [0]; break;
+            }
+            // Convert steps (0.5, 1.5...) to actual time in seconds
+            beepTimes = beepSq.map((element) => element * bitPreiod);
+            
+            // Calculate total time (last element * 1000ms) + 1 second buffer
+            endInterval = beepTimes[beepTimes.length - 1]*1000 + 1000;
+            console.log(beepTimes);
+            
+            // Redraw graph if a command is selected
+            if (cmd != "0-0") {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawLine();
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+        document.getElementById("startButton").addEventListener("click", startTimer);
+        document.getElementById("stopButton").addEventListener("click", stopTimer);
+
+        // Handle Window Resizing (Redraws graph to fit width)
+        window.addEventListener('resize', function() {
+            var windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            windowWidth = window.innerWidth;
+            plotWidth = windowWidth*0.8;
+            console.log(plotWidth);
+            canvas.width  = plotWidth+20;
+        });
+    </script>
+<div align="center">
+    <br>
+<img src="PD-Map.webp" class="img-fluid">
+</div>
+
+<div align="center">
+    <pwa-install></pwa-install>
+</div>
+<div align="center">
+    <br>
+    <p class="tinyfont">by https://ronnarong.dev <br>Version 3.1.4 - 20-Jan-26</p>
+</div>
 </body>
 </html>
