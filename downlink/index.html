@@ -1,224 +1,593 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="dark">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simple Downlink - Pro</title>
+    <link rel="manifest" href="manifest.json">
+    
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-EDKZBX7FHF"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-EDKZBX7FHF');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-EDKZBX7FHF');
     </script>
-    <title>Simple Downlink</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
+
     <script type="module">
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('pwabuilder-sw.js');
         };
     </script>
-    <style>
-        /* BASIC STYLING RESET */
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        h1,p {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            margin-right: 1px;
-            margin-left: 1px;
-        }
-        /* BUTTON STYLES */
-        .button {
-            background-color: #4CAF50; /* Green */
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-        }
-        .button:disabled {
-            background-color: #707471; /* Grey when disabled */
-        }
-        /* RESPONSIVE FONT SIZES */
-        .bigfont { font-size: 10vw; }
-        .midfont { font-size: 5vw; }
-        .smallfont { font-size: 3vw; }
-        .tinyfont { font-size: 1vw; }
-        
-        img {
-            max-width: 80%;
-            height: auto;
-        }
-        /* CANVAS BORDER */
-        canvas {
-          border: 2px solid rgb(88, 87, 87);
-          display: block;
-          align-self: center;
-        }
-    </style>
 
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Default Dark Theme */
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --border-color: #333;
+            --input-bg: #2c2c2c;
+            
+            --accent-green: #00e676;
+            --accent-orange: #ff9100;
+            --accent-blue: #2979ff;
+            --grid-line: #333;
+            
+            --border-radius: 12px;
+        }
+
+        [data-theme="light"] {
+            /* Light Theme Overrides */
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #555555;
+            --border-color: #ccc;
+            --input-bg: #f8f9fa;
+            
+            --accent-green: #00c853; 
+            --accent-orange: #ff6d00;
+            --accent-blue: #0050ef;
+            --grid-line: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh; /* changed from height to min-height */
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* HEADER & TOGGLE */
+        header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px 20px 0 20px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+
+        .slider-icon {
+            position: absolute;
+            top: 8px;
+            width: 18px;
+            height: 18px;
+            transition: opacity 0.3s;
+        }
+        .icon-sun { right: 8px; opacity: 1; color: #f39c12; }
+        .icon-moon { left: 8px; opacity: 0; color: #f1c40f; }
+
+        input:checked + .slider {
+            background-color: var(--accent-blue);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        input:checked + .slider .icon-sun { opacity: 0; }
+        input:checked + .slider .icon-moon { opacity: 1; }
+
+
+        /* PROGRESS BAR */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: var(--border-color);
+            position: fixed;
+            top: 0;
+            z-index: 100;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-blue);
+            transition: width 0.1s linear;
+        }
+
+        /* MAIN LAYOUT */
+        main {
+            /* flex: 1;  Removed to prevent forced stretching */
+            display: flex;
+            flex-direction: column;
+            padding: 10px 20px 20px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+            gap: 15px; /* Consistent gap between all elements */
+        }
+
+        /* STATUS CARD */
+        .status-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .status-card.state-high {
+            border-color: var(--accent-green);
+            background-color: rgba(0, 230, 118, 0.1);
+        }
+        
+        .status-card.state-low {
+            border-color: var(--accent-orange);
+            background-color: rgba(255, 145, 0, 0.1);
+        }
+
+        #state {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: 2px;
+            transition: color 0.3s;
+        }
+        
+        .state-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        /* TIMERS */
+        .timer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .info-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 5px;
+            color: var(--text-main);
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        #countdown {
+            color: var(--accent-orange);
+        }
+
+        /* VISUALIZATION */
+        .canvas-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        canvas {
+            width: 100%;
+            height: 100px;
+            display: block;
+        }
+
+        /* CONTROLS AREA */
+        .controls-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* margin-top: auto;  REMOVED: This was causing the big gap */
+            margin-top: 10px; /* Small fixed margin instead */
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 8px;
+            font-size: 1rem;
+            appearance: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        /* BUTTONS */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            border: none;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #startButton {
+            background-color: var(--accent-green);
+            color: #000;
+        }
+
+        #stopButton {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+        }
+        
+        #startButton:disabled {
+            background-color: var(--input-bg);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            margin-top: auto; /* Push footer to bottom if screen is tall */
+        }
+
+        /* Helper Classes */
+        .text-green { color: var(--accent-green) !important; }
+        .text-orange { color: var(--accent-orange) !important; }
+        .text-neutral { color: var(--text-main) !important; } 
+
+    </style>
 </head>
 <body>
-<div align="center">
-    <table style="width:100%">
-        <tr>
-            <td style="width:0.1%;height:10px;" align="right" bgcolor="#010499" id="progressTable"></td>
-            <td></td>
-        </tr>
-    </table>
-</div>
 
-<div  align="center">
-    <h1 id="state" class="bigfont">BEGIN</h1>
-    <div align="center"><canvas id="canvas"></canvas></div>
-    <p id="display" class="midfont">00:00:00</p>
-    <p id="countdown" class="midfont">START TO BEGIN</p>
-    <button id="startButton" class="button">START</button>
-    <button id="stopButton" class="button">STOP</button>
-</div>
-<br>
+    <div class="progress-container">
+        <div id="progressBar" class="progress-bar"></div>
+    </div>
 
-<div align="center">
-    <label class="smallfont">BIT PERIOD : </label>
-    <select id="bitSelect" class="smallfont" onchange="cmdUpdate()">
-        <option value="18" selected="selected" align="center">18s</option>
-        <option value="36" align="center">36s</option>
-        <option value="60" align="center">60s</option>
-    </select>
-</div>
-<br>
-<div align="center">
-    <label class="smallfont">COMMAND : </label>
-    <select id="cmdSelect" class="smallfont" onchange="cmdUpdate();">
-        <option value="0-0" selected="selected">Select Command</option>
-        <option value="1-0" align="center">1-0</option>
-        <option value="1-1" align="center">1-1</option>
-        <option value="1-2" align="center">1-2</option>
-        <option value="1-3" align="center">1-3</option>
-        <option value="1-4" align="center">1-4</option>
-        <option value="1-5" align="center">1-5</option>
-        <option value="1-6" align="center">1-6</option>
-        <option value="1-7" align="center">1-7</option>
-        <option value="1-8" align="center">1-8</option>
-        <option value="1-9" align="center">1-9</option>
-        <option value="1-10" align="center">1-10</option>
-        <option value="1-11" align="center">1-11</option>
-        <option value="1-12" align="center">1-12</option>
-        <option value="1-13" align="center">1-13</option>
-        <option value="1-14" align="center">1-14</option>
-        <option value="1-15" align="center">1-15</option>
-        <option value="1-16" align="center">1-16</option>
-        <option value="1-17" align="center">1-17</option>
-        <option value="1-18" align="center">1-18</option>
-        <option value="1-19" align="center">1-19</option>
-        <option value="1-20" align="center">1-20</option>
-        <option value="1-21" align="center">1-21</option>
-        <option value="1-22" align="center">1-22</option>
-        <option value="1-23" align="center">1-23</option>
-        <option value="1-24" align="center">1-24</option>
-        <option value="1-25" align="center">1-25</option>
-        <option value="1-26" align="center">1-26</option>
-        <option value="1-27" align="center">1-27</option>
-        <option value="1-28" align="center">1-28</option>
-        <option value="1-29" align="center">1-29</option>
-        <option value="1-30" align="center">1-30</option>
-        <option value="1-31" align="center">1-31</option>
-        <option value="2-0" align="center">2-0</option>
-        <option value="2-1" align="center">2-1</option>
-        <option value="2-2" align="center">2-2</option>
-        <option value="2-3" align="center">2-3</option>
-        <option value="2-4" align="center">2-4</option>
-        <option value="2-5" align="center">2-5</option>
-        <option value="2-6" align="center">2-6</option>
-        <option value="2-7" align="center">2-7</option>
-        <option value="2-8" align="center">2-8</option>
-        <option value="2-9" align="center">2-9</option>
-        <option value="2-10" align="center">2-10</option>
-        <option value="2-11" align="center">2-11</option>
-        <option value="2-12" align="center">2-12</option>
-        <option value="2-13" align="center">2-13</option>
-        <option value="2-14" align="center">2-14</option>
-        <option value="2-15" align="center">2-15</option>
-        <option value="2-16" align="center">2-16</option>
-        <option value="2-17" align="center">2-17</option>
-        <option value="2-18" align="center">2-18</option>
-        <option value="2-19" align="center">2-19</option>
-        <option value="2-20" align="center">2-20</option>
-        <option value="2-21" align="center">2-21</option>
-        <option value="2-22" align="center">2-22</option>
-        <option value="2-23" align="center">2-23</option>
-        <option value="2-24" align="center">2-24</option>
-        <option value="2-25" align="center">2-25</option>
-        <option value="2-26" align="center">2-26</option>
-        <option value="2-27" align="center">2-27</option>
-        <option value="2-28" align="center">2-28</option>
-        <option value="2-29" align="center">2-29</option>
-        <option value="2-30" align="center">2-30</option>
-        <option value="2-31" align="center">2-31</option>
-    </select>
-</div>
+    <header>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider">
+                    <svg class="slider-icon icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="slider-icon icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </div>
+            </label>
+        </div>
+    </header>
+
+    <main>
+        
+        <div id="statusCard" class="status-card">
+            <div class="state-label">Current Pump/RPM State</div>
+            <h1 id="state" class="text-neutral">READY</h1>
+        </div>
+
+        <div class="timer-grid">
+            <div class="info-card">
+                <div class="info-label">Elapsed Time</div>
+                <div id="display" class="info-value">00:00:00</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Next Change</div>
+                <div id="countdown" class="info-value">--</div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="controls-area">
+            <div class="settings-grid">
+                <div>
+                    <label>Bit Period</label>
+                    <select id="bitSelect" onchange="cmdUpdate()">
+                        <option value="18" selected>18s</option>
+                        <option value="36">36s</option>
+                        <option value="60">60s</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Command Sequence</label>
+                    <select id="cmdSelect" onchange="cmdUpdate();">
+                        <option value="0-0" selected>Select Command...</option>
+                        <option value="1-0">1-0</option>
+                        <option value="1-1">1-1</option>
+                        <option value="1-2">1-2</option>
+                        <option value="1-3">1-3</option>
+                        <option value="1-4">1-4</option>
+                        <option value="1-5">1-5</option>
+                        <option value="1-6">1-6</option>
+                        <option value="1-7">1-7</option>
+                        <option value="1-8">1-8</option>
+                        <option value="1-9">1-9</option>
+                        <option value="1-10">1-10</option>
+                        <option value="1-11">1-11</option>
+                        <option value="1-12">1-12</option>
+                        <option value="1-13">1-13</option>
+                        <option value="1-14">1-14</option>
+                        <option value="1-15">1-15</option>
+                        <option value="1-16">1-16</option>
+                        <option value="1-17">1-17</option>
+                        <option value="1-18">1-18</option>
+                        <option value="1-19">1-19</option>
+                        <option value="1-20">1-20</option>
+                        <option value="1-21">1-21</option>
+                        <option value="1-22">1-22</option>
+                        <option value="1-23">1-23</option>
+                        <option value="1-24">1-24</option>
+                        <option value="1-25">1-25</option>
+                        <option value="1-26">1-26</option>
+                        <option value="1-27">1-27</option>
+                        <option value="1-28">1-28</option>
+                        <option value="1-29">1-29</option>
+                        <option value="1-30">1-30</option>
+                        <option value="1-31">1-31</option>
+                        <option value="2-0">2-0</option>
+                        <option value="2-1">2-1</option>
+                        <option value="2-2">2-2</option>
+                        <option value="2-3">2-3</option>
+                        <option value="2-4">2-4</option>
+                        <option value="2-5">2-5</option>
+                        <option value="2-6">2-6</option>
+                        <option value="2-7">2-7</option>
+                        <option value="2-8">2-8</option>
+                        <option value="2-9">2-9</option>
+                        <option value="2-10">2-10</option>
+                        <option value="2-11">2-11</option>
+                        <option value="2-12">2-12</option>
+                        <option value="2-13">2-13</option>
+                        <option value="2-14">2-14</option>
+                        <option value="2-15">2-15</option>
+                        <option value="2-16">2-16</option>
+                        <option value="2-17">2-17</option>
+                        <option value="2-18">2-18</option>
+                        <option value="2-19">2-19</option>
+                        <option value="2-20">2-20</option>
+                        <option value="2-21">2-21</option>
+                        <option value="2-22">2-22</option>
+                        <option value="2-23">2-23</option>
+                        <option value="2-24">2-24</option>
+                        <option value="2-25">2-25</option>
+                        <option value="2-26">2-26</option>
+                        <option value="2-27">2-27</option>
+                        <option value="2-28">2-28</option>
+                        <option value="2-29">2-29</option>
+                        <option value="2-30">2-30</option>
+                        <option value="2-31">2-31</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button id="startButton">Start</button>
+                <button id="stopButton">Stop</button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>Simple Downlink v4.1 11-Feb-26 by https://ronnarong.dev</p>
+    </footer>
 
     <script>
-        // --- GLOBAL VARIABLES ---
+        // --- THEME LOGIC ---
+        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme) {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            if (currentTheme === 'light') {
+                toggleSwitch.checked = true;
+            }
+        }
+
+        function switchTheme(e) {
+            if (e.target.checked) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            if(cmd != "0-0" || beepSq.length > 0) drawLine();
+            else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--grid-line');
+                ctx.lineWidth = 1;
+                ctx.moveTo(0, 50.5);
+                ctx.lineTo(canvas.width, 50.5);
+                ctx.stroke();
+            }
+        }
+        toggleSwitch.addEventListener('change', switchTheme, false);
+
+
+        // --- ORIGINAL APP LOGIC ---
         var startTime, elapsedTime = 0;
         var bitPreiod = 18;
         var timerInterval;
-        var beepTimes = [5,10,15]; // Stores the trigger times for beeps
-        var beepSq = []; // Stores the command sequence values
+        var beepTimes = [5,10,15]; 
+        var beepSq = []; 
         
-        // Audio Setup
         var audioContext = new (window.AudioContext || window.webkitAudioContext)();
         var beepFrequency = 1200; 
         var shortBeepDuration = 200; 
         var longBeepDuration = 800; 
         
         var endInterval = beepTimes[beepTimes.length - 1]*1000;
-        var wakeLock = null; // For keeping screen awake
+        var wakeLock = null; 
         
-        // Canvas/Drawing Setup
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.width = canvas.parentElement.offsetWidth;
+        canvas.height = 100;
+
         var windowWidth = window.innerWidth;
-        var plotWidth = windowWidth*0.8; 
+        var plotWidth = canvas.width - 20; 
         var dotX = 0; 
         var dotY = 20.5; 
         var cmd = document.getElementById("cmdSelect").value;
-        
-        // Throttle Variable: Ensures we only beep once per second during countdown
         var lastProcessedSecond = -1;
 
-        // --- TIMER FUNCTIONS ---
+        const statusCard = document.getElementById("statusCard");
+        const stateText = document.getElementById("state");
+        const progressBar = document.getElementById("progressBar");
+
+        // Initial Grid Draw
+        ctx.beginPath();
+        ctx.strokeStyle = "#333"; 
+        if(currentTheme === 'light') ctx.strokeStyle = "#e0e0e0";
+        ctx.lineWidth = 1;
+        ctx.moveTo(0, 50.5);
+        ctx.lineTo(canvas.width, 50.5);
+        ctx.stroke();
 
         function startTimer() {
-            // FIX: Resume AudioContext. Browsers block audio until user interaction.
             if (audioContext.state === 'suspended') {
                 audioContext.resume();
             }
 
             if (document.getElementById("cmdSelect").value != "0-0") {  
                 startTime = Date.now() - elapsedTime;
-                
-                // Reset throttle tracker
                 lastProcessedSecond = -1; 
-                
-                // UPDATE RATE: 100ms (10 times/sec). 
-                // This is faster than 1000ms to ensure we catch the '0' moment accurately,
-                // avoiding the "missed beep" bug if the browser lags.
                 timerInterval = setInterval(updateTimer, 100); 
                 
-                // Lock UI elements
-                document.getElementById("state").textContent = "HIGH";
+                updateStateDisplay("HIGH");
                 document.getElementById("startButton").disabled = true;
                 document.getElementById("bitSelect").disabled = true;
                 document.getElementById("cmdSelect").disabled = true;
                 
-                // Initial beep and draw
                 safePlayBeep(shortBeepDuration);
                 dotX = 0;
                 dotY = 20.5;
@@ -229,88 +598,67 @@
         function stopTimer() {
             clearInterval(timerInterval);
             
-            // Reset UI
             document.getElementById("display").textContent = "00:00:00";
-            document.getElementById("countdown").textContent = "START TO BEGIN";
-            document.getElementById("state").innerHTML = "END";
-            document.getElementById("progressTable").style.width = "0%";
+            document.getElementById("countdown").textContent = "READY";
+            updateStateDisplay("END");
+            progressBar.style.width = "0%";
             
-            // Unlock UI elements
             document.getElementById("startButton").disabled = false;
             document.getElementById("bitSelect").disabled = false;
             document.getElementById("cmdSelect").disabled = false;
             
-            // Reset Internal Logic
             elapsedTime = 0; 
             lastProcessedSecond = -1;
             cmdUpdate(); 
         }
         
-        // --- MAIN LOOP (Runs every 100ms) ---
         function updateTimer() {
             var currentTime = Date.now();
             elapsedTime = currentTime - startTime;
 
-            // 1. OVERTIME CHECK (After sequence ends)
-            // If elapsed time is greater than the total sequence time
             if (elapsedTime >= endInterval) {
                 var postTime = elapsedTime - endInterval;
                 document.getElementById("display").textContent = formatTime(postTime);
-                document.getElementById("countdown").textContent = "TIME SINCE COMPLETE";
-                document.getElementById("state").innerHTML = "DONE";
-                document.getElementById("progressTable").style.width = "100%";
-                return; // Stop processing the rest of the function
+                document.getElementById("countdown").textContent = "COMPLETE";
+                updateStateDisplay("DONE");
+                progressBar.style.width = "100%";
+                return;
             }
 
-            // 2. STANDARD DISPLAY UPDATE
             var formattedTime = formatTime(elapsedTime);
             document.getElementById("display").textContent = formattedTime;
             progressUpdate();
             
-            // 3. SEQUENCE & BEEP LOGIC
             if (beepTimes.length > 0) {
                 var currentSeconds = Math.floor(elapsedTime / 1000);
                 
-                // A. CATCH-UP LOGIC (Fixes "Stuck" and "Minus" bugs)
-                // If the browser slept and woke up late, currentSeconds might be > beepTime.
-                // The 'while' loop skips past any events we missed while asleep.
                 while (beepTimes.length > 0 && beepTimes[0] <= currentSeconds) {
-                    safePlayBeep(longBeepDuration); // Play change sound
-                    toggle(); // Switch High/Low state
-                    beepTimes.shift(); // Remove the finished step from array
+                    safePlayBeep(longBeepDuration); 
+                    toggle(); 
+                    beepTimes.shift(); 
                 }
 
-                // B. COUNTDOWN LOGIC (3, 2, 1)
-                // logic: check if we have entered a NEW second to prevent rapid-fire beeping
-                // because this function runs 10x per second.
                 if (currentSeconds > lastProcessedSecond) {
                     lastProcessedSecond = currentSeconds;
-                    
                     if (beepTimes.length > 0) {
                         var nextTarget = beepTimes[0];
                         var diff = nextTarget - currentSeconds;
-
-                        // Only beep if time remaining is 3, 2, or 1
                         if (diff <= 3 && diff > 0) {
                             safePlayBeep(shortBeepDuration);
                         }
-                        
-                        document.getElementById("countdown").textContent = "CHANGE IN " + diff + " SEC";
+                        document.getElementById("countdown").textContent = diff + " sec";
                     }
                 }
             }
             
-            // 4. ANIMATION UPDATE
-            drawLine(); // Keep the lines drawn
-            moveCircle(); // Move the orange dot
+            drawLine(); 
+            moveCircle(); 
         }
 
-        // Helper: Formats milliseconds into HH:MM:SS
         function formatTime(sec) {
             var hours = Math.floor(sec / (1000 * 60 * 60));
             var minutes = Math.floor((sec % (1000 * 60 * 60)) / (1000 * 60));
             var seconds = Math.floor((sec % (1000 * 60)) / 1000);
-
             return (
                 (hours < 10 ? "0" : "") + hours + ":" +
                 (minutes < 10 ? "0" : "") + minutes + ":" +
@@ -318,12 +666,11 @@
             );
         }
 
-        // Helper: Wrapper to prevent audio crashes
-        // Some browsers throw errors if AudioContext is not ready.
         function safePlayBeep(duration) {
             try {
                 var oscillator = audioContext.createOscillator();
                 oscillator.frequency.value = beepFrequency;
+                oscillator.type = 'square'; 
                 oscillator.connect(audioContext.destination);
                 oscillator.start();
                 setTimeout(function() {
@@ -334,62 +681,42 @@
             }
         }
 
-        // Helper: Toggles High/Low text and Y position for graph
+        function updateStateDisplay(status) {
+            stateText.innerHTML = status;
+            
+            statusCard.classList.remove("state-high", "state-low");
+            stateText.classList.remove("text-green", "text-orange", "text-neutral");
+
+            if (status === "HIGH") {
+                statusCard.classList.add("state-high");
+                stateText.classList.add("text-green");
+            } else if (status === "LOW") {
+                statusCard.classList.add("state-low");
+                stateText.classList.add("text-orange");
+            } else {
+                stateText.classList.add("text-neutral");
+            }
+        }
+
         function toggle() {
-            if (document.getElementById("state").innerHTML == "HIGH" ) {
-                document.getElementById("state").innerHTML = "LOW"
+            if (stateText.innerHTML == "HIGH" ) {
+                updateStateDisplay("LOW");
                 dotY = 80.5;
-            } else if (document.getElementById("state").innerHTML == "LOW") {
-                document.getElementById("state").innerHTML = "HIGH"
+            } else if (stateText.innerHTML == "LOW") {
+                updateStateDisplay("HIGH");
                 dotY = 20.5;
             }
         }
 
         function progressUpdate() {
-            document.getElementById("progressTable").style.width = (elapsedTime/endInterval)*100 + "%";
+            progressBar.style.width = (elapsedTime/endInterval)*100 + "%";
         }
-
-        // --- WAKE LOCK API (Keeps screen on on mobile) ---
-        if ('wakeLock' in navigator) {
-            console.log("Wake lock is supported")
-            async function requestWakeLock() {
-                try {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    console.log('Wake lock activated.');
-                } catch (err) {
-                    console.error(`${err.name}, ${err.message}`);
-                }
-            }
-            function releaseWakeLock() {
-                if (wakeLock !== null) {
-                    wakeLock.release();
-                    wakeLock = null;
-                    console.log('Wake lock released.');
-                }
-            }
-            requestWakeLock();
-            // Re-acquire lock if user switches tabs and comes back
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible' && wakeLock === null) {
-                requestWakeLock();
-                } else if (document.visibilityState === 'hidden' && wakeLock !== null) {
-                releaseWakeLock();
-                }
-            });
-        } else {
-            console.log("Wake lock is not supported")
-        }
-
-        // --- CANVAS DRAWING ---
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-        canvas.width  = plotWidth+20;
-        canvas.height = 100;
 
         function drawLine() {
             var h = 0;
             var l = 0;
-            // Function to draw a single High/Low segment
+            plotWidth = canvas.width - 20;
+
             function drawupdown(s0,s1,s2) {
                 h = l + (s1-s0)*(plotWidth/beepSq[beepSq.length-1])
                 l = h + (s2-s1)*(plotWidth/beepSq[beepSq.length-1])
@@ -398,10 +725,27 @@
                 ctx.lineTo(l-0.5, 80.5); 
                 ctx.lineTo(l-0.5, 20.5); 
             }
+            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            var gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-line').trim();
             ctx.beginPath();
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 1;
+            ctx.moveTo(0, 50.5);
+            ctx.lineTo(canvas.width, 50.5);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.strokeStyle = "#00e676"; 
+            if(document.documentElement.getAttribute('data-theme') === 'light') {
+                ctx.strokeStyle = "#00c853"; 
+            }
+            
+            ctx.lineWidth = 3;
+            ctx.lineJoin = "round";
+            
             ctx.moveTo(0, 20.5); 
-            // Loop through sequence array and draw
             if (beepSq.length > 1) { 
                 drawupdown(0,beepSq[0],beepSq[1]) 
                 for (let i = 1; i < beepSq.length-1; i = i+2) {
@@ -414,144 +758,142 @@
 
         function drawCircle() {
             ctx.beginPath();
-            ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
-            ctx.fillStyle = "orange";
+            ctx.arc(dotX, dotY, 8, 0, Math.PI * 2); 
+            ctx.fillStyle = "#ff9100";
+            if(document.documentElement.getAttribute('data-theme') === 'light') {
+                 ctx.fillStyle = "#ff6d00"; 
+            }
+            
             ctx.fill();
             ctx.closePath();
         }
 
-        // SMOOTH DOT MOVEMENT
-        // Calculates position based on percentage of total time (0.0 to 1.0)
-        // This ensures smoothness regardless of update frequency (10fps)
         function moveCircle() {
             if (beepSq.length > 0) {
-                // Calculate total duration of the sequence in milliseconds
                 var totalDuration = beepSq[beepSq.length-1] * bitPreiod * 1000;
-                
-                // Calculate percentage
                 var progress = elapsedTime / totalDuration;
-
-                // Set X position
                 dotX = progress * plotWidth;
-                
-                // Prevent dot from going past the end
                 if (dotX > plotWidth) dotX = plotWidth;
-
                 drawCircle();
             }
         }
 
-        // --- COMMAND SEQUENCES ---
-        // Updates the beepSq array based on the dropdown selection
         function cmdUpdate() {
             cmd = document.getElementById("cmdSelect").value;
             bitPreiod = parseInt(document.getElementById("bitSelect").value);
-
+            
             switch (cmd) {
-            case "1-0": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5]; break; 
-            case "1-1": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
-            case "1-2": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
-            case "1-3": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
-            case "1-4": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-            case "1-5": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5]; break;  
-            case "1-6": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5]; break;  
-            case "1-7": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
-            case "1-8": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-            case "1-9": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
-            case "1-10": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5]; break;  
-            case "1-11": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
-            case "1-12": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5]; break;  
-            case "1-13": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5, 13]; break;  
-            case "1-14": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
-            case "1-15": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
-            case "1-16": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-            case "1-17": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
-            case "1-18": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5]; break;  
-            case "1-19": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
-            case "1-20": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5]; break;  
-            case "1-21": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13]; break;  
-            case "1-22": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
-            case "1-23": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
-            case "1-24": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
-            case "1-25": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
-            case "1-26": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
-            case "1-27": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
-            case "1-28": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-            case "1-29": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5]; break;  
-            case "1-30": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5]; break;  
-            case "1-31": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
-            case "2-0": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
-            case "2-1": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
-            case "2-2": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
-            case "2-3": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
-            case "2-4": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-            case "2-5": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5]; break;  
-            case "2-6": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5]; break;  
-            case "2-7": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
-            case "2-8": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-            case "2-9": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
-            case "2-10": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5]; break;  
-            case "2-11": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
-            case "2-12": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5]; break;  
-            case "2-13": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5, 13]; break;  
-            case "2-14": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
-            case "2-15": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
-            case "2-16": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-            case "2-17": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
-            case "2-18": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5]; break;  
-            case "2-19": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
-            case "2-20": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5]; break;  
-            case "2-21": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13]; break;  
-            case "2-22": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
-            case "2-23": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
-            case "2-24": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
-            case "2-25": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
-            case "2-26": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
-            case "2-27": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
-            case "2-28": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
-            case "2-29": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5]; break;  
-            case "2-30": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5]; break;  
-            case "2-31": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
-            default: beepSq = [0]; break;
+                case "1-0": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5]; break; 
+                case "1-1": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
+                case "1-2": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
+                case "1-3": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
+                case "1-4": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+                case "1-5": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5]; break;  
+                case "1-6": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5]; break;  
+                case "1-7": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
+                case "1-8": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+                case "1-9": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
+                case "1-10": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5]; break;  
+                case "1-11": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
+                case "1-12": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5]; break;  
+                case "1-13": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5, 13]; break;  
+                case "1-14": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
+                case "1-15": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
+                case "1-16": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+                case "1-17": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
+                case "1-18": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5]; break;  
+                case "1-19": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
+                case "1-20": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5]; break;  
+                case "1-21": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13]; break;  
+                case "1-22": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
+                case "1-23": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
+                case "1-24": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
+                case "1-25": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
+                case "1-26": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
+                case "1-27": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
+                case "1-28": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+                case "1-29": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5]; break;  
+                case "1-30": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5]; break;  
+                case "1-31": beepSq = [0.5, 1.5, 2.5, 3.5, 4, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
+                case "2-0": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
+                case "2-1": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
+                case "2-2": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
+                case "2-3": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
+                case "2-4": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+                case "2-5": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5]; break;  
+                case "2-6": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5]; break;  
+                case "2-7": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
+                case "2-8": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+                case "2-9": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
+                case "2-10": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5]; break;  
+                case "2-11": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
+                case "2-12": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5]; break;  
+                case "2-13": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5, 13]; break;  
+                case "2-14": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
+                case "2-15": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
+                case "2-16": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+                case "2-17": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10, 10.5, 11.5, 12, 12.5]; break;  
+                case "2-18": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11.5, 12.5]; break;  
+                case "2-19": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9, 9.5, 10.5, 11, 11.5, 12.5, 13]; break;  
+                case "2-20": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11, 11.5, 12.5]; break;  
+                case "2-21": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13]; break;  
+                case "2-22": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11.5, 12, 12.5, 13]; break;  
+                case "2-23": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]; break;  
+                case "2-24": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11, 11.5, 12.5]; break;  
+                case "2-25": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10, 10.5, 11.5, 12.5, 13]; break;  
+                case "2-26": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11.5, 12, 12.5, 13]; break;  
+                case "2-27": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9.5, 10.5, 11, 11.5, 12, 12.5]; break;  
+                case "2-28": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11, 11.5, 12, 12.5, 13]; break;  
+                case "2-29": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10.5, 11.5, 12, 12.5]; break;  
+                case "2-30": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11.5, 12.5]; break;  
+                case "2-31": beepSq = [0.5, 1.5, 2, 2.5, 3.5, 4, 4.5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12.5, 13]; break;  
+                default: beepSq = [0]; break;
             }
-            // Convert steps (0.5, 1.5...) to actual time in seconds
+            
             beepTimes = beepSq.map((element) => element * bitPreiod);
-            
-            // Calculate total time (last element * 1000ms) + 1 second buffer
             endInterval = beepTimes[beepTimes.length - 1]*1000 + 1000;
-            console.log(beepTimes);
             
-            // Redraw graph if a command is selected
             if (cmd != "0-0") {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawLine();
             }
         }
 
-        // --- EVENT LISTENERS ---
         document.getElementById("startButton").addEventListener("click", startTimer);
         document.getElementById("stopButton").addEventListener("click", stopTimer);
 
-        // Handle Window Resizing (Redraws graph to fit width)
         window.addEventListener('resize', function() {
-            var windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-            windowWidth = window.innerWidth;
-            plotWidth = windowWidth*0.8;
-            console.log(plotWidth);
-            canvas.width  = plotWidth+20;
+            canvas.width = canvas.parentElement.offsetWidth;
+            plotWidth = canvas.width - 20;
+            if(cmd != "0-0") drawLine();
+            else {
+                 // redraw grid if resize happens on empty state
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--grid-line');
+                ctx.lineWidth = 1;
+                ctx.moveTo(0, 50.5);
+                ctx.lineTo(canvas.width, 50.5);
+                ctx.stroke();
+            }
         });
-    </script>
-<div align="center">
-    <br>
-<img src="PD-Map.webp" class="img-fluid">
-</div>
 
-<div align="center">
-    <pwa-install></pwa-install>
-</div>
-<div align="center">
-    <br>
-    <p class="tinyfont">by https://ronnarong.dev <br>Version 3.1.4 - 20-Jan-26</p>
-</div>
+        if ('wakeLock' in navigator) {
+            async function requestWakeLock() {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake lock activated.');
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
+                }
+            }
+            requestWakeLock();
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && wakeLock === null) {
+                    requestWakeLock();
+                }
+            });
+        }
+    </script>
 </body>
 </html>
