@@ -1,29 +1,255 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-<html lang=”en”>
-
-  <head>
-
-    <meta charset=”UTF-8″>
-
-    <meta name=”viewport” content=”width=device-width, initial-scale=1.0″>
-
-    <meta http-equiv=”X-UA-Compatible” content=”ie=edge”>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ronnarong.Dev</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-  </head>
+    <style>
+        :root {
+            --bg:       #0d0d0d;
+            --card-bg:  #161616;
+            --text:     #f0f0f0;
+            --muted:    #555;
+            --green:    #00e676;
+            --orange:   #ff9100;
+            --border:   #222;
+        }
 
-  <body>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            /* subtle dot grid */
+            background-image: radial-gradient(circle, #1e1e1e 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            gap: 52px;
+        }
+
+        /* ── Waveform graphic ── */
+        .wave-container {
+            width: 100%;
+            max-width: 480px;
+            animation: fadeSlideDown 0.7s ease both;
+        }
+
+        .wave-svg {
+            width: 100%;
+            height: auto;
+            overflow: visible;
+        }
+
+        .wave-path {
+            fill: none;
+            stroke: var(--green);
+            stroke-width: 2.5;
+            stroke-linecap: square;
+            stroke-linejoin: miter;
+            stroke-dasharray: 800;
+            stroke-dashoffset: 800;
+            animation: draw 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+        }
+
+        @keyframes draw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .wave-dot {
+            fill: var(--orange);
+            opacity: 0;
+            animation: fadeIn 0.01s 1.75s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* ── Title block ── */
+        .title-block {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            animation: fadeSlideUp 0.7s 0.2s ease both;
+        }
+
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(2.4rem, 10vw, 4.8rem);
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        h1 .accent { color: var(--green); }
+
+        .tagline {
+            font-size: 0.85rem;
+            color: var(--muted);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* ── Project cards ── */
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            width: 100%;
+            max-width: 560px;
+            animation: fadeSlideUp 0.7s 0.4s ease both;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            text-decoration: none;
+            color: var(--text);
+            flex: 1;
+            min-width: 240px;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+        }
+
+        .card:hover {
+            border-color: var(--green);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(0, 230, 118, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-arrow {
+            color: var(--muted);
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .card:hover .card-arrow {
+            color: var(--green);
+            transform: translate(2px, -2px);
+        }
+
+        .card-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .card-desc {
+            font-size: 0.82rem;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .card-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--green);
+            background: rgba(0, 230, 118, 0.07);
+            border: 1px solid rgba(0, 230, 118, 0.15);
+            padding: 3px 8px;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* ── Keyframes ── */
+        @keyframes fadeSlideDown {
+            from { opacity: 0; transform: translateY(-14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
 
     <main>
 
-        <h1>Welcome to Ronnarong.Dev</h1>  
+        <!-- Square-wave graphic -->
+        <div class="wave-container">
+            <svg class="wave-svg" viewBox="0 0 480 80" preserveAspectRatio="xMidYMid meet">
+                <path id="wavePath" class="wave-path"
+                    d="M0,60 L57,60 L57,20 L114,20 L114,60 L192,60 L192,20 L230,20
+                       L230,60 L307,60 L307,20 L364,20 L364,60 L422,60 L422,20 L480,20" />
+                <circle class="wave-dot" r="6">
+                    <animateMotion dur="3s" repeatCount="indefinite" begin="1.75s"
+                        path="M0,60 L57,60 L57,20 L114,20 L114,60 L192,60 L192,20 L230,20
+                              L230,60 L307,60 L307,20 L364,20 L364,60 L422,60 L422,20 L480,20" />
+                </circle>
+            </svg>
+        </div>
 
-        <p>Hosted on GitHub Pages!</p>
+        <!-- Name & tagline -->
+        <div class="title-block">
+            <h1>ronnarong<span class="accent">.dev</span></h1>
+            <p class="tagline">tools &amp; experiments</p>
+        </div>
+
+        <!-- Projects -->
+        <div class="cards">
+            <a href="/downlink/" class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="#00e676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                    <span class="card-arrow">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"/>
+                            <polyline points="7 7 17 7 17 17"/>
+                        </svg>
+                    </span>
+                </div>
+                <div class="card-title">Simple Downlink</div>
+                <div class="card-desc">A timing tool for satellite downlink command sequences. Generates precise HIGH/LOW signals with audio feedback.</div>
+                <span class="card-badge">PWA · v4.2</span>
+            </a>
+        </div>
 
     </main>
 
-  </body>
+    <footer>ronnarong.dev &mdash; github pages</footer>
 
+</body>
 </html>
