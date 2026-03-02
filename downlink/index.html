@@ -366,7 +366,72 @@
         /* Helper Classes */
         .text-green { color: var(--accent-green) !important; }
         .text-orange { color: var(--accent-orange) !important; }
-        .text-neutral { color: var(--text-main) !important; } 
+        .text-neutral { color: var(--text-main) !important; }
+
+        /* PD MAP BUTTON */
+        #mapButton {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 8px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: none;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        #mapButton:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+        #mapButton:active {
+            transform: scale(0.97);
+        }
+
+        /* MAP MODAL */
+        #mapModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        #mapModal.open {
+            display: flex;
+        }
+        #mapModal img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+            object-fit: contain;
+        }
+        #mapClose {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            box-shadow: none;
+            letter-spacing: 0;
+            text-transform: none;
+        }
 
     </style>
 </head>
@@ -376,8 +441,15 @@
         <div id="progressBar" class="progress-bar"></div>
     </div>
 
+    <!-- PD Map Modal -->
+    <div id="mapModal" role="dialog" aria-label="PD Map">
+        <button id="mapClose" onclick="document.getElementById('mapModal').classList.remove('open')" aria-label="Close">&#x2715;</button>
+        <img src="PD-Map.webp" alt="PD Map" />
+    </div>
+
     <header>
         <div class="theme-switch-wrapper">
+            <button id="mapButton" onclick="document.getElementById('mapModal').classList.add('open')" style="margin-right:12px">PD Map</button>
             <label class="theme-switch" for="checkbox">
                 <input type="checkbox" id="checkbox" />
                 <div class="slider">
@@ -502,7 +574,7 @@
     </main>
 
     <footer>
-        <p>Simple Downlink v4.3 02-Mar-26 by https://ronnarong.dev</p>
+        <p>Simple Downlink v4.4 02-Mar-26 by https://ronnarong.dev</p>
     </footer>
 
     <script src="DLTime.js"></script>
@@ -803,6 +875,11 @@
         document.getElementById("startButton").addEventListener("click", startTimer);
         document.getElementById("stopButton").addEventListener("click", stopTimer);
 
+        // Close map modal when clicking backdrop
+        document.getElementById("mapModal").addEventListener("click", function(e) {
+            if (e.target === this) this.classList.remove("open");
+        });
+
         window.addEventListener('resize', function() {
             canvas.width = canvas.parentElement.offsetWidth;
             plotWidth = canvas.width - 20;
@@ -837,4 +914,5 @@
         }
     </script>
 </body>
+
 </html>
