@@ -410,6 +410,10 @@
             border-radius: 12px;
             box-shadow: 0 8px 40px rgba(0,0,0,0.6);
             object-fit: contain;
+            transition: filter 0.3s ease;
+        }
+        [data-theme="dark"] #mapModal img {
+            filter: invert(1);
         }
         #mapClose {
             position: absolute;
@@ -574,7 +578,7 @@
     </main>
 
     <footer>
-        <p>Simple Downlink v4.4 02-Mar-26 by https://ronnarong.dev</p>
+        <p>Simple Downlink v4.5 03-Mar-26 by https://ronnarong.dev</p>
     </footer>
 
     <script src="DLTime.js"></script>
