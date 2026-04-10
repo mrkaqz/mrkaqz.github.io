@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Okinawa Complete Guide · Ron & Theeranan</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean: #0068a8;
+  --sky: #7dd4f0;
+  --deep: #012f6e;
+  --coral: #e05c35;
+  --amber: #d4893a;
+  --rust: #9e3d1e;
+  --paper: #f8f4ee;
+  --cream: #fdf9f4;
+  --ink: #1a1208;
+  --muted: #7a6a55;
+  --border: rgba(139,100,60,0.15);
+  --food-bg: #fff8f0;
+  --food-border: #f0c9a0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:var(--ink); overflow-x:hidden; }
+
+/* ─── HERO ─── */
+.hero {
+  background: linear-gradient(155deg,#012f6e 0%,#0068a8 50%,#00a8d4 100%);
+  padding: 52px 24px 72px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content:''; position:absolute; bottom:-2px; left:0; right:0; height:64px;
+  background:var(--paper); clip-path:ellipse(54% 100% at 50% 100%);
+}
+.hero-waves {
+  position:absolute; inset:0; opacity:.06;
+  background:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(255,255,255,.5) 28px,rgba(255,255,255,.5) 30px);
+}
+.hero-icon { font-size:52px; animation:float 3.5s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+.hero-title { font-family:'Playfair Display',serif; font-size:clamp(30px,9vw,56px); color:#fff; letter-spacing:3px; margin-top:6px; text-shadow:0 2px 24px rgba(0,0,0,.2); }
+.hero-title em { color:#90e0ef; font-style:italic; }
+.hero-sub { color:rgba(255,255,255,.7); font-size:13px; letter-spacing:3px; text-transform:uppercase; margin-top:8px; font-family:'DM Mono',monospace; }
+.hero-chips { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:20px; }
+.hero-chip { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:#fff; padding:6px 16px; border-radius:20px; font-size:12.5px; backdrop-filter:blur(8px); }
+
+/* ─── TOP NAV ─── */
+.top-nav {
+  position:sticky; top:0; z-index:100;
+  background:var(--deep);
+  display:flex; overflow-x:auto; gap:2px; padding:0 14px;
+  scrollbar-width:none; border-bottom:1px solid rgba(255,255,255,.06);
+}
+.top-nav::-webkit-scrollbar { display:none; }
+.nav-btn {
+  flex-shrink:0; padding:11px 16px; font-size:12px; font-weight:600;
+  color:rgba(255,255,255,.5); cursor:pointer;
+  border-bottom:2px solid transparent; transition:all .2s;
+  white-space:nowrap; font-family:'Noto Sans Thai',sans-serif;
+}
+.nav-btn:hover { color:var(--sky); }
+.nav-btn.active { color:var(--sky); border-bottom-color:var(--sky); }
+
+/* ─── VIEWS ─── */
+.view { display:none; }
+.view.active { display:block; }
+
+/* ─── SHARED CONTAINER ─── */
+.container { max-width:720px; margin:0 auto; padding:24px 16px 60px; }
+
+/* ─── NOTICE ─── */
+.notice {
+  background:linear-gradient(135deg,#fff8e1,#ffe8a0);
+  border-left:4px solid #f0a800; border-radius:12px;
+  padding:12px 16px; margin-bottom:22px;
+  font-size:13px; display:flex; gap:10px; align-items:flex-start;
+}
+
+/* ─── DAY CARDS ─── */
+.day-card {
+  margin-bottom:20px; border-radius:18px; overflow:hidden;
+  box-shadow:0 3px 20px rgba(0,80,160,.09);
+  border:1px solid rgba(0,104,168,.08);
+  animation:fadeUp .45s ease both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.day-card:nth-child(1){animation-delay:.04s} .day-card:nth-child(2){animation-delay:.08s}
+.day-card:nth-child(3){animation-delay:.12s} .day-card:nth-child(4){animation-delay:.16s}
+.day-card:nth-child(5){animation-delay:.20s} .day-card:nth-child(6){animation-delay:.24s}
+
+.day-hd {
+  display:flex; align-items:center; gap:12px;
+  padding:16px 20px; cursor:pointer; user-select:none;
+}
+.day-emoji { font-size:22px; flex-shrink:0; }
+.day-badge {
+  color:#fff; font-size:10.5px; font-weight:700;
+  letter-spacing:1px; padding:3px 9px; border-radius:7px;
+  white-space:nowrap; font-family:'DM Mono',monospace;
+}
+.day-info { flex:1; }
+.day-title { font-size:15px; font-weight:700; line-height:1.3; }
+.day-date  { font-size:11.5px; color:var(--muted); margin-top:1px; }
+.chevron { color:var(--ocean); font-size:16px; transition:transform .3s; flex-shrink:0; }
+.day-card.open .chevron { transform:rotate(180deg); }
+.day-body { display:none; padding:4px 20px 20px; border-top:1px solid rgba(0,104,168,.07); }
+.day-card.open .day-body { display:block; }
+
+/* ─── DAY COLORS ─── */
+.d1 .day-hd{background:linear-gradient(135deg,#e4f2fc,#cce6f8)} .d1 .day-badge{background:#0068a8}
+.d2 .day-hd{background:linear-gradient(135deg,#e4fcf2,#c8f5e2)} .d2 .day-badge{background:#1f8c5e}
+.d3 .day-hd{background:linear-gradient(135deg,#fdf4e4,#f8e8ca)} .d3 .day-badge{background:#c47e10}
+.d4 .day-hd{background:linear-gradient(135deg,#f2e4fc,#e6cafc)} .d4 .day-badge{background:#7a3aad}
+.d5 .day-hd{background:linear-gradient(135deg,#fce4e4,#f8caca)} .d5 .day-badge{background:#b03020}
+.d6 .day-hd{background:linear-gradient(135deg,#e4fcfc,#cafafa)} .d6 .day-badge{background:#0f8f8f}
+
+/* ─── SECTION LABEL ─── */
+.sec-label {
+  font-size:10.5px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
+  color:#bbb; margin:18px 0 8px; display:flex; align-items:center; gap:8px;
+  font-family:'DM Mono',monospace;
+}
+.sec-label::after { content:''; flex:1; height:1px; background:#e8e0d4; }
+
+/* ─── TIMELINE ─── */
+.timeline { position:relative; padding-left:26px; }
+.timeline::before {
+  content:''; position:absolute; left:7px; top:6px; bottom:6px;
+  width:2px; background:linear-gradient(to bottom,var(--ocean),var(--sky)); border-radius:2px;
+}
+.tl-item { position:relative; margin-bottom:16px; }
+.tl-item::before {
+  content:''; position:absolute; left:-23px; top:5px;
+  width:10px; height:10px; border-radius:50%;
+  background:var(--ocean); border:2px solid var(--paper); box-shadow:0 0 0 2px var(--ocean);
+}
+.tl-item.food-item::before { background:var(--coral); box-shadow:0 0 0 2px var(--coral); }
+.tl-time { font-size:10.5px; color:var(--ocean); font-weight:700; letter-spacing:.5px; margin-bottom:1px; font-family:'DM Mono',monospace; }
+.tl-item.food-item .tl-time { color:var(--rust); }
+.tl-place { font-size:14.5px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.tl-desc { font-size:12.5px; color:#555; margin-top:3px; line-height:1.6; }
+
+/* ─── RESTAURANT CARD ─── */
+.rc {
+  background:var(--food-bg);
+  border:1px solid var(--food-border);
+  border-radius:11px; padding:11px 13px; margin-top:7px;
+}
+.rc-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.rc-name { font-size:13px; font-weight:700; color:#8a2e08; }
+.rc-badges { display:flex; gap:4px; flex-wrap:wrap; }
+.rb {
+  font-size:9.5px; font-weight:700; letter-spacing:.6px;
+  padding:2px 7px; border-radius:8px; color:#fff; white-space:nowrap;
+}
+.rb-must   { background:#c0392b; }
+.rb-local  { background:#1f8c5e; }
+.rb-unique { background:#7a3aad; }
+.rb-iconic { background:#0068a8; }
+.rb-book   { background:#c47e10; }
+.rb-snack  { background:#888; }
+.rc-desc { font-size:12px; color:#5a4030; margin-top:5px; line-height:1.6; }
+.rc-chips { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+.rc-chip { background:#fff; border:1px solid #e8c4a0; color:#7a3a10; font-size:11.5px; padding:3px 9px; border-radius:10px; }
+.rc-meta { font-size:11px; color:#999; margin-top:5px; display:flex; flex-wrap:wrap; gap:8px; }
+.rc-meta span { display:flex; align-items:center; gap:3px; }
+
+/* ─── FOOD CHIPS (day summary) ─── */
+.food-row { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+.food-chip { background:#fff0e6; border:1px solid #f0c8a0; color:#9a4010; padding:5px 12px; border-radius:16px; font-size:12px; }
+
+/* ─── TIP BOX ─── */
+.tip-box { background:#e6f2fc; border-radius:10px; padding:10px 13px; margin-top:12px; font-size:12px; color:#004d99; display:flex; gap:8px; }
+
+/* ═══════════════════════════════════════
+   FOOD GUIDE VIEW
+═══════════════════════════════════════ */
+.fg-section { margin-bottom:28px; }
+.fg-cat-hd { display:flex; align-items:center; gap:12px; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+.fg-cat-icon { width:40px; height:40px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.fg-cat-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--ink); }
+.fg-cat-sub { font-size:12px; color:var(--muted); margin-top:1px; }
+
+.fg-card {
+  background:var(--cream); border:1px solid var(--border); border-radius:14px;
+  margin-bottom:12px; overflow:hidden;
+  transition:box-shadow .2s;
+}
+.fg-card:hover { box-shadow:0 5px 22px rgba(120,70,20,.11); }
+.fg-card-top { display:flex; align-items:flex-start; gap:10px; padding:14px 14px 10px; }
+.fg-num { font-family:'DM Mono',monospace; font-size:10.5px; color:var(--amber); background:rgba(212,137,58,.1); border:1px solid rgba(212,137,58,.22); border-radius:6px; padding:3px 7px; flex-shrink:0; margin-top:1px; }
+.fg-name { font-size:15px; font-weight:700; color:var(--ink); line-height:1.3; }
+.fg-jp { font-size:11.5px; color:var(--muted); font-family:'DM Mono',monospace; }
+.fg-desc { font-size:12.5px; color:#3a2e1a; line-height:1.65; padding:0 14px 10px 34px; }
+.fg-meta { display:flex; flex-wrap:wrap; gap:5px; padding:0 14px 12px 34px; }
+.fg-tag { font-size:11px; padding:3px 9px; border-radius:14px; font-weight:500; }
+.fg-tag.price  { background:#edf7ee; color:#1f6e28; border:1px solid #b0d8b4; }
+.fg-tag.area   { background:#eef2fc; color:#1e3d8e; border:1px solid #b4c8f0; }
+.fg-tag.hours  { background:#fdf4e4; color:#7a4a08; border:1px solid #e8c888; }
+.fg-tag.alert  { background:#fdeeed; color:#8e1818; border:1px solid #f0b8b8; }
+.fg-tag.vibe   { background:#f4edfb; color:#5a2888; border:1px solid #d0b8f0; }
+.fg-order { background:rgba(212,137,58,.07); border-top:1px solid var(--border); padding:9px 14px 9px 34px; font-size:12px; color:var(--rust); font-weight:600; }
+.fg-order span { color:var(--muted); font-weight:400; }
+
+/* day anchor badges */
+.day-anchor { font-size:10px; background:#e8f2fc; border:1px solid #b4d4f0; color:#0050aa; padding:2px 8px; border-radius:8px; margin-left:6px; font-family:'DM Mono',monospace; font-weight:500; cursor:pointer; }
+.day-anchor:hover { background:#cce4fc; }
+
+/* food grid */
+.fg-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.fg-item { background:var(--cream); border:1px solid var(--border); border-radius:11px; padding:12px; }
+.fg-item-icon { font-size:24px; margin-bottom:5px; }
+.fg-item-name { font-size:13.5px; font-weight:700; color:var(--ink); }
+.fg-item-jp { font-size:10.5px; color:var(--muted); font-family:'DM Mono',monospace; margin-bottom:4px; }
+.fg-item-desc { font-size:12px; color:#3a2e1a; line-height:1.55; }
+
+/* drinks */
+.drink-row { display:flex; flex-direction:column; gap:10px; }
+.drink-item { display:flex; gap:12px; background:var(--cream); border:1px solid var(--border); border-radius:12px; padding:13px; }
+.drink-icon { font-size:26px; flex-shrink:0; width:40px; text-align:center; }
+.drink-name { font-size:13.5px; font-weight:700; color:var(--ink); }
+.drink-jp { font-size:10.5px; color:var(--muted); font-family:'DM Mono',monospace; margin-bottom:3px; }
+.drink-desc { font-size:12px; color:#3a2e1a; line-height:1.6; }
+
+/* tips */
+.tip-list { display:flex; flex-direction:column; gap:9px; }
+.tip-row { display:flex; gap:10px; background:var(--cream); border:1px solid var(--border); border-radius:11px; padding:12px 14px; }
+.tip-n { font-family:'Playfair Display',serif; font-size:20px; color:var(--amber); flex-shrink:0; width:24px; line-height:1; }
+.tip-t { font-size:13px; color:#3a2e1a; line-height:1.65; }
+.tip-t strong { color:var(--ink); }
+
+/* ESSENTIALS */
+.essentials { background:linear-gradient(135deg,var(--deep),#0068a8); border-radius:18px; padding:22px 20px; color:#fff; margin-top:28px; }
+.essentials h3 { font-family:'Playfair Display',serif; font-size:19px; margin-bottom:14px; }
+.ess-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.ess-item { background:rgba(255,255,255,.12); border-radius:11px; padding:11px; font-size:12.5px; }
+.ess-item strong { display:block; font-size:10px; letter-spacing:1px; text-transform:uppercase; opacity:.65; margin-bottom:3px; font-family:'DM Mono',monospace; }
+
+@media(max-width:480px){
+  .ess-grid,.fg-grid{grid-template-columns:1fr}
+}
+
+/* ─── MAP LINK ─── */
+.map-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600;
+  color: #1a73e8; background: #e8f0fe;
+  border: 1px solid #c5d8fd;
+  padding: 3px 9px; border-radius: 12px;
+  text-decoration: none; margin-top: 6px;
+  transition: background 0.18s;
+}
+.map-link:hover { background: #c5d8fd; }
+.map-link svg { flex-shrink: 0; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-waves"></div>
+  <div class="hero-icon">🌊</div>
+  <div class="hero-title">Okinawa <em>Guide</em></div>
+  <div class="hero-sub">Ron & Theeranan · Jun 14–19, 2026</div>
+  <div class="hero-chips">
+    <span class="hero-chip">✈️ 14–19 มิ.ย. 2026</span>
+    <span class="hero-chip">👥 2 คน</span>
+    <span class="hero-chip">🗓️ 6 วัน</span>
+    <span class="hero-chip">🍽️ ร้านอาหาร 20+ ร้าน</span>
+    <span class="hero-chip">🏨 Mercure Okinawa Naha</span>
+  </div>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<div class="top-nav">
+  <div class="nav-btn active" onclick="showView('itinerary',this)">🗓️ แผนเที่ยว</div>
+  <div class="nav-btn" onclick="showView('food',this)">🍽️ Food Guide</div>
+  <div class="nav-btn" onclick="showView('must',this)">🍙 Must-eat</div>
+  <div class="nav-btn" onclick="showView('drinks',this)">🥃 Drinks</div>
+  <div class="nav-btn" onclick="showView('tips',this)">💡 Tips</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VIEW: ITINERARY
+══════════════════════════════════════════════════════ -->
+<div class="view active" id="view-itinerary">
+<div class="container">
+
+  <div class="notice">
+    <span>⛅</span>
+    <div><strong>มิถุนายน = ปลาย Tsuyu (ฤดูฝน)</strong> ร้อนชื้น ~29°C เตรียมร่มพับ + กันแดด SPF50+ ทุกวัน</div>
+  </div>
+
+
+  <!-- HOTEL INFO -->
+  <div style="background:var(--cream);border:1px solid var(--border);border-radius:18px;padding:18px 20px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="width:44px;height:44px;border-radius:12px;background:#d4401a;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🏨</div>
+      <div style="flex:1;">
+        <div style="font-size:16px;font-weight:700;color:var(--ink);">Mercure Okinawa Naha</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:1px;">Accor · 3-3-19 Tsubogawa, Naha City · ติด Tsubogawa Station (Yui Rail)</div>
+      </div>
+      <div style="flex-shrink:0;"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ2dU_VKBp5TQRMaFKOe3hb2w" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12.5px;">
+      <div style="background:var(--food-bg);border:1px solid var(--food-border);border-radius:10px;padding:9px 11px;">
+        <div style="color:var(--muted);font-size:11px;margin-bottom:2px;">เช็คอิน</div>
+        <div style="font-weight:700;color:var(--ink);">14 มิ.ย.</div>
+        <div style="color:var(--muted);">หลัง 14:00</div>
+      </div>
+      <div style="background:var(--food-bg);border:1px solid var(--food-border);border-radius:10px;padding:9px 11px;">
+        <div style="color:var(--muted);font-size:11px;margin-bottom:2px;">เช็คเอาท์</div>
+        <div style="font-weight:700;color:var(--ink);">19 มิ.ย.</div>
+        <div style="color:var(--muted);">ก่อน 11:00</div>
+      </div>
+      <div style="background:var(--food-bg);border:1px solid var(--food-border);border-radius:10px;padding:9px 11px;">
+        <div style="color:var(--muted);font-size:11px;margin-bottom:2px;">ห้องพัก</div>
+        <div style="font-weight:700;color:var(--ink);">5 คืน</div>
+        <div style="color:var(--muted);">Classic Double</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px;">
+      <span style="background:#e8f0fe;color:#1a4ea8;border:1px solid #c5d8fd;padding:3px 10px;border-radius:12px;">📞 +81-98-8557111</span>
+      <span style="background:#e8f0fe;color:#1a4ea8;border:1px solid #c5d8fd;padding:3px 10px;border-radius:12px;">📋 Confirmation: 1688897188954910</span>
+      <span style="background:#fff3cd;color:#856404;border:1px solid #f0d060;padding:3px 10px;border-radius:12px;">⚠️ ยกเลิกฟรีก่อน 18:00 น. วันที่ 13 มิ.ย.</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);display:flex;align-items:flex-start;gap:6px;">
+      <span style="flex-shrink:0;">💡</span>
+      <span>ห้องพักมีครบ: อ่างอาบน้ำ, Bathrobe, Smart toilet, Bidet, ไดร์เป่าผม, รองเท้าแตะ — <strong style="color:var(--ink);">ไม่รวมอาหารเช้า</strong> · ค่าทำลายสัญญาหลัง 18:00 น. วันที่ 13 มิ.ย. = THB 2,629.55</span>
+    </div>
+  </div>
+
+  <!-- DAY 1 -->
+  <div class="day-card d1 open">
+    <div class="day-hd" onclick="toggle(this)">
+      <span class="day-emoji">🛬</span>
+      <div class="day-info">
+        <div class="day-badge">DAY 1</div>
+        <div class="day-title">มาถึง · สำรวจ Naha</div>
+        <div class="day-date">อาทิตย์ 14 มิ.ย. · ลงจอด 15:55</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="day-body">
+      <div class="timeline">
+
+        <div class="tl-item">
+          <div class="tl-time">15:55</div>
+          <div class="tl-place">🛬 ถึง Naha Airport → เช็คอิน</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJjSyLjsRp5TQRkP5WN6rOTFA" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">นั่ง Yui Rail จากสนามบินเข้าเมือง ~15 นาที ซื้อ 1-day pass ¥800</div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">17:30</div>
+          <div class="tl-place">🛍️ Kokusai-dori Street</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ-w8fcHdp5TQR_PlKZmQhehM" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">ถนนช้อปปิ้ง 1.6 กม. เต็มไปด้วยร้านของฝาก อาหารข้างทาง และบรรยากาศโอกินาว่าแท้ๆ</div>
+        </div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">18:00</div>
+          <div class="tl-place">🍙 ของกินเล่นระหว่างเดิน — Potama</div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Potama <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ポーたま · Pork Tamago Onigiri</span></div>
+              <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span><span class="rb rb-local">STREET FOOD</span></div>
+            </div>
+            <div class="rc-desc">ข้าวปั้นสไตล์โอกินาว่า ใส่ Spam + ไข่ รสเค็มนัว ทำสดทุกลูก มีสาขาบน Kokusai-dori เดินแล้วแวะได้เลย — กินเป็นของว่างระหว่างรอมื้อเย็น</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🍙 Pork Tamago Classic</span>
+              <span class="rc-chip">🥚 Egg & Spam variant</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ~¥300/ลูก</span><span>📍 Kokusai-dori / Makishi</span><span>⏰ 07:00–20:00</span>
+            
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJRX9edXpp5TQRRGYawVc2Jmk" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+        <div class="sec-label">🍜 มื้อเย็น · วันแรก</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">19:00</div>
+          <div class="tl-place">🍜 มื้อเย็นแรก — Okinawa Soba</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJLbLQNZ1p5TQRA4kxN6fqHTc" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Mikado <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ミカド</span></div>
+              <div class="rc-badges"><span class="rb rb-local">LOCAL</span></div>
+            </div>
+            <div class="rc-desc">ร้านข้าวโลคอลราคาประหยัด อาหารโอกินาว่าครบทุกเมนู เหมาะที่สุดสำหรับมื้อแรก มีเมนูภาษาอังกฤษ</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🍜 Okinawa Soba</span>
+              <span class="rc-chip">🥬 Goya Champuru</span>
+              <span class="rc-chip">🐷 Rafute</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ¥700–1,200</span><span>⏰ 10:00–21:00 (ปิดอาทิตย์)</span><span>📍 Naha</span>
+            
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJLbLQNZ1p5TQRA4kxN6fqHTc" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">21:00</div>
+          <div class="tl-place">🥃 จิบ Awamori — Dachibin</div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Dachibin <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">だちびん</span></div>
+              <div class="rc-badges"><span class="rb rb-local">IZAKAYA</span></div>
+            </div>
+            <div class="rc-desc">ไอซากายะระดับยอดเยี่ยม บรรยากาศโอกินาว่าแท้ เปิดถึงเที่ยงคืน เหมาะนั่งดื่มคลายเหนื่อยจากเที่ยวบิน</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🍺 Orion Beer draft</span>
+              <span class="rc-chip">🥃 Awamori rocks</span>
+              <span class="rc-chip">🐷 Rafute กับแกล้ม</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ¥2,500–4,000/คน</span><span>⏰ 17:00–00:00</span><span>⚠️ มี surcharge</span>
+            
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJQXwoQHhp5TQRlj_adegJH9U" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="food-row">
+        <span class="food-chip">🍙 Potama ของว่างคืนแรก</span>
+        <span class="food-chip">🍜 Okinawa Soba มื้อเย็น</span>
+        <span class="food-chip">🥃 Awamori คืนแรก</span>
+        <span class="food-chip">🍺 Orion Beer</span>
+      </div>
+      <div class="tip-box">💡 วันแรกลงจอดบ่าย แวะซื้อ Potama กินระหว่างเดิน Kokusai-dori แล้วค่อยนั่งกินมื้อเย็นสบายๆ</div>
+    </div>
+  </div>
+
+  <!-- DAY 2 -->
+  <div class="day-card d2">
+    <div class="day-hd" onclick="toggle(this)">
+      <span class="day-emoji">🌊</span>
+      <div class="day-info">
+        <div class="day-badge">DAY 2</div>
+        <div class="day-title">ใต้เกาะ · Shuri Castle · Makishi</div>
+        <div class="day-date">จันทร์ 15 มิ.ย. · 🚖 GO/DiDi + 🚃 Yui Rail</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="day-body">
+      <div class="timeline">
+
+        <div class="sec-label">🌊 ออกเดินทางทางใต้ก่อน</div>
+
+        <div class="tl-item">
+          <div class="tl-time">09:00</div>
+          <div class="tl-place">🌊 Okinawa World & ถ้ำ Gyokusendo</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJa3ifUYVp5TQR3QZD1tyLml4" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">ถ้ำหินงอก 890 เมตร + หมู่บ้านวัฒนธรรม Ryukyu ชม Habu-sake ใช้เวลา ~2 ชม. · 🚖 <strong>แท็กซี่ GO/DiDi จาก Mercure ~30 นาที ~¥2,000</strong></div>
+        </div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">11:30</div>
+          <div class="tl-place">🐟 Itoman Fish Market</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJnfH0IcJn5TQRFTMsWWcjFlg" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">ตลาดปลาอิโตมัง <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">糸満漁業協同組合</span></div>
+              <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span><span class="rb rb-local">ของสด</span></div>
+            </div>
+            <div class="rc-desc">ตลาดปลาชาวประมง Itoman ราคาถูก ไปให้ทันก่อนของหมด มีที่นั่งกินในตลาดได้เลย · ใกล้ Okinawa World ~10 กม. · 🚖 ~¥1,000 ~10 นาที</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🐟 ปลาสดตามฤดูกาล</span>
+              <span class="rc-chip">🦑 ปลาหมึกย่าง</span>
+              <span class="rc-chip">🦐 กุ้งสด</span>
+            </div>
+            <div class="rc-meta"><span>💴 ราคาตลาด</span><span>⏰ เช้า–บ่าย</span><span>📍 Itoman</span></div>
+          </div>
+        </div>
+
+        <div class="sec-label">🏯 กลับเข้า Naha บ่าย</div>
+
+        <div class="tl-item">
+          <div class="tl-time">13:30</div>
+          <div class="tl-place">🏯 Shuri Castle (UNESCO)</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJZ9v0bP5r5TQRi0-esrqficA" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">ปราสาทมรดกโลก ศูนย์กลางอาณาจักร Ryukyu เปิด 8:30–19:00 ค่าเข้า ¥400 · 🚖 แท็กซี่กลับ Naha ~¥3,000 → แท็กซี่ต่อไป Shuri</div>
+        </div>
+
+        <div class="sec-label">🍱 มื้อเย็น · Makishi Market</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">16:00</div>
+          <div class="tl-place">🐟 Makishi Public Market</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJy1Zdsr9p5TQR2ET-2o69ZKg" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Makishi Public Market ชั้น 2 <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">第一牧志公設市場</span></div>
+              <div class="rc-badges"><span class="rb rb-must">MUST</span></div>
+            </div>
+            <div class="rc-desc">ระบบ "Lift-up" สุดดัง — เลือกปลาสดชั้น 1 ส่งขึ้นครัวชั้น 2 ปรุงสด เปิดถึง 22:00 เหมาะมื้อเย็น · 🚃 <strong>Yui Rail จาก Shuri → Makishi ~15 นาที</strong></div>
+            <div class="rc-chips">
+              <span class="rc-chip">🐟 Mibai Sashimi</span>
+              <span class="rc-chip">🦪 Luminous Shellfish Garlic Butter</span>
+              <span class="rc-chip">🐷 หมูสามชั้นตุ๋น</span>
+            </div>
+            <div class="rc-meta"><span>💴 ¥1,000–2,500</span><span>⏰ 08:00–22:00</span><span>📍 Makishi, Naha</span></div>
+          </div>
+        </div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">19:00</div>
+          <div class="tl-place">🍶 ดินเนอร์ — Yunangi</div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Yunangi <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ゆうなんぎい</span></div>
+              <div class="rc-badges"><span class="rb rb-local">LOCAL FAV</span><span class="rb rb-book">จองล่วงหน้า</span></div>
+            </div>
+            <div class="rc-desc">ไอซากายะบรรยากาศเหมือนบ้าน คนท้องถิ่นนิยมมาก เมนูโอกินาว่าครบ ลอง Umibudo สาหร่ายองุ่นทะเล และ Jimami Tofu</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🫙 Umibudo + Ponzu</span>
+              <span class="rc-chip">🥬 Goya Champuru</span>
+              <span class="rc-chip">🥛 Jimami Tofu</span>
+              <span class="rc-chip">🥃 Awamori</span>
+            </div>
+            <div class="rc-meta"><span>💴 ¥2,000–3,500/คน</span><span>⏰ 17:00–21:30 (ปิดอาทิตย์)</span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="food-row">
+        <span class="food-chip">🌊 Okinawa World + ถ้ำ</span>
+        <span class="food-chip">🐟 Itoman Fish Market เช้า</span>
+        <span class="food-chip">🏯 Shuri Castle บ่าย</span>
+        <span class="food-chip">🐟 Makishi Market มื้อเย็น</span>
+        <span class="food-chip">🫙 Umibudo ครั้งแรก</span>
+      </div>
+      <div class="tip-box">💡 ไป Itoman ให้ทันเช้า — ของสดมักหมดก่อนบ่าย · แท็กซี่ผ่าน GO หรือ DiDi · Makishi Market เปิดถึง 22:00 ไม่ต้องรีบ</div>
+
+    </div>
+  </div>
+
+  <!-- DAY 3 -->
+  <div class="day-card d3">
+    <div class="day-hd" onclick="toggle(this)">
+      <span class="day-emoji">🏖️</span>
+      <div class="day-info">
+        <div class="day-badge">DAY 3</div>
+        <div class="day-title">American Village · หาดกลางเกาะ</div>
+        <div class="day-date">อังคาร 16 มิ.ย. · รับรถเช่าวันนี้</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="day-body">
+      <div class="timeline">
+
+        <div class="tl-item">
+          <div class="tl-time">08:30</div>
+          <div class="tl-place">🚗 รับรถ MINI — Plumeria Rent-a-Car</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://plumeria-rentacar.co.jp/" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> Plumeria Rent-a-Car</a></div>
+          <div class="tl-desc">โทรแจ้ง Plumeria เมื่อถึงสนามบิน (098-996-3710) · รถรับฟรี One-by-One จาก Naha Airport → ร้าน · ใช้ต่อเนื่อง 3 วัน 16–18 มิ.ย. · คืนรถวันที่ 18 · เปิด 09:30–20:00</div>
+          
+        </div>
+
+        <div style="background:#fff8f0;border:1px solid #f0c9a0;border-radius:11px;padding:11px 13px;margin-top:2px;margin-bottom:4px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+            <div style="font-size:13px;font-weight:700;color:#8a2e08;">Plumeria Rent-a-Car · MINI Cooper</div>
+            <a class="map-link" href="https://plumeria-rentacar.co.jp/" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> Plumeria Rent-a-Car</a>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            <span style="background:#fff;border:1px solid #e8c4a0;color:#7a3a10;font-size:11.5px;padding:3px 9px;border-radius:10px;">🚙 MINI ONE / Cooper / Convertible / Crossover / Clubman</span>
+            <span style="background:#fff;border:1px solid #e8c4a0;color:#7a3a10;font-size:11.5px;padding:3px 9px;border-radius:10px;">🛬 รับ-คืนที่สนามบิน Naha</span>
+            <span style="background:#fff;border:1px solid #e8c4a0;color:#7a3a10;font-size:11.5px;padding:3px 9px;border-radius:10px;">🚐 ฟรีรถรับ One-by-One</span>
+            <span style="background:#fff;border:1px solid #e8c4a0;color:#7a3a10;font-size:11.5px;padding:3px 9px;border-radius:10px;">🏨 ส่งถึงโรงแรม Naha ได้</span>
+            <span style="background:#fff;border:1px solid #e8c4a0;color:#7a3a10;font-size:11.5px;padding:3px 9px;border-radius:10px;">📞 098-996-3794</span>
+            <span style="background:#fff;border:1px solid #e8c4a0;color:#7a3a10;font-size:11.5px;padding:3px 9px;border-radius:10px;">⏰ 09:30–20:00</span>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">09:30</div>
+          <div class="tl-place">🌊 Cape Manzamo</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ-adBh3gD5TQRGFnnzG897N8" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">หน้าผาหินรูปงวงช้างชมทะเล East China Sea จุดถ่ายรูปสุดฮิต สวยมากช่วงเช้า</div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">11:00</div>
+          <div class="tl-place">🇺🇸 Mihama American Village · Chatan</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJzZoVCAUT5TQRzIueHYt83hs" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">ย่านผสมสไตล์อเมริกัน-โอกินาว่า ร้านกาแฟ บูติค วิวหาด Ferris wheel</div>
+        </div>
+
+        <div class="sec-label">🌮 มื้อกลางวัน · American Village</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">12:30</div>
+          <div class="tl-place">🍣 Gourmet Conveyor Belt Sushi — American Village</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJzZoVCAUT5TQRzIueHYt83hs" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Gourmet Conveyor Belt Sushi (แถว American Village)</div>
+              <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span><span class="rb rb-iconic">แนะนำมาก</span></div>
+            </div>
+            <div class="rc-desc">ร้านซูชิสายพานแถว American Village / Chatan ที่วิดีโอแนะนำว่ารสชาติดีมากเกินราคา ปลาสดจากทะเลโอกินาว่า กินเป็นมื้อกลางวันสบายๆ ก่อนลงหาด</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🍣 Sushi สายพาน</span>
+              <span class="rc-chip">🐟 ปลาสดโอกินาว่า</span>
+              <span class="rc-chip">🌮 Taco Rice ต่อด้วยถ้ายังหิว</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ¥100–300/จาน</span><span>📍 American Village / Chatan</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">14:00</div>
+          <div class="tl-place">🍦 Blue Seal Ice Cream — แวะระหว่างวัน</div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Blue Seal Ice Cream <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ブルーシール</span></div>
+              <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span></div>
+            </div>
+            <div class="rc-desc">วิดีโอแนะนำหลายรส — นอกจาก Beni Imo (เผือกม่วง) ที่ฮิตอยู่แล้ว ลองรส Sea Salt (เกลือ) และ Pistachio ด้วย ร้านอยู่ทั่ว American Village</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🍦 Beni Imo (เผือกม่วง)</span>
+              <span class="rc-chip">🧂 Sea Salt</span>
+              <span class="rc-chip">🌰 Pistachio</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ¥400–600</span><span>📍 ทั่ว American Village</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">14:30</div>
+          <div class="tl-place">🏄 Araha Beach / Sunset Beach</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJJdFU6tsT5TQRFtGMxK9GlzU" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">หาดใกล้ American Village น้ำสวย ว่ายน้ำ หรือเล่น SUP Board</div>
+        </div>
+
+        <div class="sec-label">🌅 มื้อเย็น · ชม Sunset</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">18:00</div>
+          <div class="tl-place">🥩 ดินเนอร์ริมหาด — Jack's Steak House</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ22ZssJlp5TQR9_xYHgr0hFo" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Jack's Steak House</div>
+              <div class="rc-badges"><span class="rb rb-iconic">ICONIC</span><span class="rb rb-local">POST-WAR LEGEND</span></div>
+            </div>
+            <div class="rc-desc">สเต็กเฮาส์อเมริกันเก่าแก่ที่สุดใน Naha เปิดมาตั้งแต่หลังสงคราม เสิร์ฟ Tenderloin บนกระทะร้อน บรรยากาศ Retro diner สุดเท่ เหมาะมื้อเย็นหลังวันชิลหาด</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🥩 No.1 Tenderloin skillet</span>
+              <span class="rc-chip">🥗 Soup & Salad</span>
+              <span class="rc-chip">☕ Coffee ปิดท้าย</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ¥2,000–4,000</span><span>⏰ 11:00–22:30 (ปิดพุธ)</span><span>📍 Naha ใกล้ Kokusai</span>
+            
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ22ZssJlp5TQR9_xYHgr0hFo" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="food-row">
+        <span class="food-chip">🍣 Conveyor Belt Sushi มื้อเที่ยง</span>
+        <span class="food-chip">🍦 Blue Seal Sea Salt / Pistachio</span>
+        <span class="food-chip">🥩 Jack's Steak มื้อเย็น</span>
+      </div>
+      <div class="tip-box">💡 Blue Seal มีหลายรสที่ไม่ค่อยเห็นที่อื่น — Sea Salt และ Pistachio เป็นรสที่วิดีโอแนะนำ นอกเหนือจาก Beni Imo คลาสสิก</div>
+    </div>
+  </div>
+
+  <!-- DAY 4 -->
+  <div class="day-card d4">
+    <div class="day-hd" onclick="toggle(this)">
+      <span class="day-emoji">🐋</span>
+      <div class="day-info">
+        <div class="day-badge">DAY 4</div>
+        <div class="day-title">ทางเหนือ · Churaumi Aquarium</div>
+        <div class="day-date">พุธ 17 มิ.ย. · ใช้รถเช่าต่อเนื่อง</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="day-body">
+      <div class="timeline">
+
+        <div class="tl-item">
+          <div class="tl-time">07:30</div>
+          <div class="tl-place">🚗 ออกเดินทางเหนือ</div>
+          <div class="tl-desc">ขับขึ้นเหนือตาม Okinawa Expressway ~1.5 ชม. ถึง Motobu</div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">09:00</div>
+          <div class="tl-place">🐋 Churaumi Aquarium</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJPZ5hUjH65DQR_p_dD3CmCOo" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">1 ใน 3 อควาเรียมใหญ่ที่สุดในโลก ตู้ Kuroshio Sea โชว์ whale shark + manta ray ค่าเข้า ¥2,180</div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">11:00</div>
+          <div class="tl-place">🏖️ Emerald Beach</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ28eWwqj75DQRTFD9otdbYL8" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">หาดในโอเชียนพาร์คติดอควาเรียม น้ำใสเขียวมรกต ว่ายน้ำฟรี</div>
+        </div>
+
+        <div class="sec-label">🍍 มื้อกลางวัน · ทางเหนือ</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">13:00</div>
+          <div class="tl-place">🍜 มื้อกลางวัน — Nakijin Soba</div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Nakijin Soba <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">今帰仁そば</span></div>
+              <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span><span class="rb rb-local">HOMEMADE</span></div>
+            </div>
+            <div class="rc-desc">ร้านโซบะเส้นสดทำเองแถว Churaumi / Nakijin ที่วิดีโอแนะนำโดยเฉพาะ เส้นหนึบกว่าร้านอื่น และนอกจากโซบะยังมี pudding ทำเองเป็นของหวานเด็ดประจำร้าน</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🍜 Nakijin Soba เส้นสดทำเอง</span>
+              <span class="rc-chip">🍮 Homemade Pudding</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ¥800–1,400</span><span>📍 แถว Nakijin / Motobu</span>
+            
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJz0_tgDH45DQRybM4itbsS3E" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">14:30</div>
+          <div class="tl-place">🫙 คาเฟ่สาหร่ายพวงองุ่น — Umibudo Soft Cream</div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">คาเฟ่ / ฟาร์ม Umibudo ทางเหนือ</div>
+              <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span><span class="rb rb-unique">UNIQUE</span></div>
+            </div>
+            <div class="rc-desc">ดูวิธีการเลี้ยงสาหร่ายพวงองุ่น Umibudo จากฟาร์มจริงๆ และลองเมนูไฮไลท์คือ Soft Cream ใส่ Umibudo สดๆ — รสชาติแปลกใหม่ เค็มนิดๆ จากทะเล เป็นประสบการณ์ที่หาไม่ได้ที่อื่น</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🍦 Umibudo Soft Cream</span>
+              <span class="rc-chip">🫙 Umibudo สด + Ponzu</span>
+            </div>
+            <div class="rc-meta">
+              <span>📍 แถวเหนือ Okinawa</span><span>💴 ¥400–700</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">15:00</div>
+          <div class="tl-place">🏯 Nakijin Castle (UNESCO)</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJk_KWO7b55DQRF6wOVeWpIDE" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">ปราสาทริมหน้าผาทะเล สวยมาก มรดกโลก ไม่ค่อยมีนักท่องเที่ยว</div>
+        </div>
+
+        <div class="sec-label">🥩 มื้อเย็น · กลับ Naha</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">19:30</div>
+          <div class="tl-place">🥩 ดินเนอร์พิเศษ — Steak House 88</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ2R9RXXpp5TQRHCj78FkhYpU" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Steak House 88 <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ステーキハウス88 国際通り店</span></div>
+              <div class="rc-badges"><span class="rb rb-iconic">WAGYU</span></div>
+            </div>
+            <div class="rc-desc">Wagyu จากฟาร์มตัวเอง สาขา Kokusai Street เป็นสาขาเดียวที่มี Salad Bar เหมาะมื้อเย็นหลังขับรถทั้งวัน</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🥩 Wagyu Sirloin</span>
+              <span class="rc-chip">🥗 Salad Bar</span>
+              <span class="rc-chip">🍺 Orion Beer</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ¥2,500–5,000</span><span>⏰ 11:00–23:00</span><span>📍 Kokusai-dori</span>
+            
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ2R9RXXpp5TQRHCj78FkhYpU" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="food-row">
+        <span class="food-chip">🍜 Nakijin Soba เส้นสดทำเอง</span>
+        <span class="food-chip">🍮 Homemade Pudding</span>
+        <span class="food-chip">🍦 Umibudo Soft Cream</span>
+        <span class="food-chip">🥩 Wagyu Steak มื้อเย็น</span>
+      </div>
+      <div class="tip-box">💡 Nakijin Soba อยู่ใกล้ Nakijin Castle มาก — กินเสร็จแล้วเดินชมปราสาทได้เลย ประหยัดเวลาเดินทาง</div>
+    </div>
+  </div>
+
+  <!-- DAY 5 -->
+  <div class="day-card d5">
+    <div class="day-hd" onclick="toggle(this)">
+      <span class="day-emoji">🏝️</span>
+      <div class="day-info">
+        <div class="day-badge">DAY 5</div>
+        <div class="day-title">Kouri Island · วันชิลริมทะเล</div>
+        <div class="day-date">พฤหัส 18 มิ.ย. · ใช้รถเช่าต่อเนื่อง · คืนรถวันนี้</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="day-body">
+      <div class="timeline">
+
+        <div class="tl-item">
+          <div class="tl-time">09:00</div>
+          <div class="tl-place">🌉 Kouri Bridge → Kouri Island</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJyy0FRAhZ5DQRIfztLp8vdWc" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">วิวสะพาน Kouri Bridge เขียวฟ้าสวยที่สุดในโอกินาว่า ถ่ายรูปจากสะพาน</div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">10:00</div>
+          <div class="tl-place">🐚 Kouri Ocean Tower + Tinu Beach (Heart Rock)</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJf3Y9SjJY5DQRIZUnKV_U1Hg" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJEx3cOjJY5DQRJM-BcuwWU-g" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">หอชมวิว 360° + หาดลับหินรูปหัวใจ จุด Instagrammable สุดฮิต ทะเลใสมาก</div>
+        </div>
+
+        <div class="sec-label">🦞 มื้อกลางวัน · บนเกาะ Kouri</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">12:30</div>
+          <div class="tl-place">🦐 มื้อกลางวันบนเกาะ — Kouri Shrimp</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJcep34MxZ5DQR5VjNV0a8HWg" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Kouri Shrimp <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">コウリシュリンプ</span></div>
+              <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span><span class="rb rb-iconic">ดังมากในไทย</span></div>
+            </div>
+            <div class="rc-desc">ร้านกุ้งผัดเนยกระเทียมชื่อดังบนเกาะ Kouri ที่วิดีโอแนะนำโดยเฉพาะ — รสเนยกระเทียมเข้มข้นถูกปาก เป็นที่นิยมมากในหมู่คนไทย เสิร์ฟมาร้อนๆ กินกับข้าวริมทะเล</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🦐 Garlic Butter Shrimp</span>
+              <span class="rc-chip">🍚 ข้าวคู่กัน</span>
+              <span class="rc-chip">🍋 Lemon squeeze</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ¥1,000–1,800</span><span>📍 Kouri Island</span><span>⏰ เปิดกลางวัน</span>
+            
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJcep34MxZ5DQR5VjNV0a8HWg" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">14:30</div>
+          <div class="tl-place">🌊 Snorkeling · ว่ายน้ำ</div>
+          <div class="tl-desc">น้ำรอบเกาะ Kouri ใสมาก ดำน้ำตื้นดูปะการัง หรือนั่งเล่นน้ำริมหาด</div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">17:30</div>
+          <div class="tl-place">🚗 คืนรถ MINI — Plumeria Rent-a-Car</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://plumeria-rentacar.co.jp/" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> Plumeria Rent-a-Car</a></div>
+          <div class="tl-desc">ขับกลับ Naha ~90 กม. ~1.5 ชม. · คืนรถที่ Plumeria สาขา Naha Airport · ร้านรับส่งกลับโรงแรมได้ (บริการ hotel delivery ย่าน Naha) · ครบ 3 วัน 16–18 มิ.ย.</div>
+        </div>
+
+        <div class="sec-label">🐷 มื้อเย็น · คืนพิเศษ Naha</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">19:00</div>
+          <div class="tl-place">🐷 ดินเนอร์พิเศษ — Hobaru Teppanyaki</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJzdPhS4hp5TQRESZw-vECvsY" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Hobaru <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">帆張</span></div>
+              <div class="rc-badges"><span class="rb rb-unique">PREMIUM</span><span class="rb rb-book">จองล่วงหน้า!</span></div>
+            </div>
+            <div class="rc-desc">Teppanyaki ระดับสูงสุดใน Naha ใช้ Yaeyama beef เลี้ยงในโอกินาว่าโดยเฉพาะ และ <strong>Agu Pork</strong> — หมูพันธุ์พื้นเมืองโอกินาว่าที่หาไม่ได้ที่อื่น ไขมันเยอะแต่ไม่เลี่ยน นิยมทำชาบูจิ้มน้ำซอสไข่ดิบ + ต้นหอม ตามที่วิดีโอแนะนำ</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🥩 Yaeyama Wagyu Teppanyaki</span>
+              <span class="rc-chip">🐷 Agu Pork</span>
+              <span class="rc-chip">🥗 Okinawa Tofu Salad</span>
+            </div>
+            <div class="rc-meta">
+              <span>💴 ¥6,000–12,000/คน</span><span>📍 หน้า Okinawa Prefectural Gov.</span><span>⚠️ จองล่วงหน้า</span>
+            
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJzdPhS4hp5TQRESZw-vECvsY" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">21:30</div>
+          <div class="tl-place">🍣 ปิดคืน — Parlor Koyaji</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJLavxvXBp5TQRCIcrtH6CYI0" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Parlor Koyaji <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">パーラーこやじ</span></div>
+              <div class="rc-badges"><span class="rb rb-local">LOCAL GEM</span></div>
+            </div>
+            <div class="rc-desc">ไอซากายะเล็กๆ ซ่อนตัว ขึ้นชื่อ Mackerel Sushi และ Beef Tendon กับ Tofu ราคาไม่แพง มีเมนูอังกฤษ</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🐟 Mackerel Sushi</span>
+              <span class="rc-chip">🥃 Awamori จิบปิดท้าย</span>
+            </div>
+            <div class="rc-meta"><span>💴 ¥1,500–2,500/คน</span><span>⏰ 15:00–22:00</span>
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJLavxvXBp5TQRCIcrtH6CYI0" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="food-row">
+        <span class="food-chip">🦐 Kouri Shrimp Garlic Butter</span>
+        <span class="food-chip">🥩 Yaeyama Wagyu</span>
+        <span class="food-chip">🐷 Agu Pork Shabu</span>
+        <span class="food-chip">🐟 Mackerel Sushi ปิดคืน</span>
+      </div>
+      <div class="tip-box">💡 Kouri Shrimp มีคิวนาน — แวะไปต่อคิวก่อนไปเดินเที่ยว Tinu Beach แล้วค่อยกลับมารับ / จอง Hobaru ตั้งแต่วันแรกที่มาถึง!</div>
+    </div>
+  </div>
+
+  <!-- DAY 6 -->
+  <div class="day-card d6">
+    <div class="day-hd" onclick="toggle(this)">
+      <span class="day-emoji">✈️</span>
+      <div class="day-info">
+        <div class="day-badge">DAY 6</div>
+        <div class="day-title">ช้อปของฝาก · กลับบ้าน</div>
+        <div class="day-date">ศุกร์ 19 มิ.ย. · บินกลับ 16:55</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="day-body">
+      <div class="timeline">
+
+        <div class="sec-label">🍳 มื้อเช้า</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">08:00</div>
+          <div class="tl-place">🍳 อาหารเช้า — Manmaru Cafe</div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Manmaru Cafe <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">まるたま</span></div>
+              <div class="rc-badges"><span class="rb rb-local">BREAKFAST FAV</span></div>
+            </div>
+            <div class="rc-desc">ร้านอาหารเช้ายอดนิยมในหมู่คนท้องถิ่น เมนูผสมโอกินาว่าดั้งเดิม-สมัยใหม่ บรรยากาศอบอุ่น</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🍱 Okinawa Breakfast Set</span>
+              <span class="rc-chip">🥣 Yushi Tofu Soup</span>
+              <span class="rc-chip">🍙 Pork Tamago Onigiri</span>
+            </div>
+            <div class="rc-meta"><span>💴 ¥600–1,000</span><span>⏰ 07:00–15:00 (ปิดเสาร์-อาทิตย์)</span></div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">09:30</div>
+          <div class="tl-place">🛒 ช้อปของฝาก — Kokusai-dori + Don Quijote</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJNcZYDXpp5TQR022qR4dmEnw" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">ซื้อ Beni Imo Tart, Chinsuko, Shikuwasa concentrate — ราคาถูกกว่าสนามบิน</div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">11:00</div>
+          <div class="tl-place">🎨 Ryukyu Glass / Yachimun Pottery</div>
+          <div class="tl-desc">แก้ว Ryukyu หรือเซรามิก Yachimun ของฝากสวยไม่ซ้ำใคร</div>
+        </div>
+
+        <div class="sec-label">🍜 มื้อสุดท้ายในโอกินาว่า</div>
+
+        <div class="tl-item food-item">
+          <div class="tl-time">12:30</div>
+          <div class="tl-place">🍜 มื้อสุดท้าย — Nuchigafu</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJcSlg7G9p5TQR0kV9LiX1lOY" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="rc">
+            <div class="rc-top">
+              <div class="rc-name">Nuchigafu <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ぬちがふぅ</span></div>
+              <div class="rc-badges"><span class="rb rb-unique">BEAUTIFUL</span></div>
+            </div>
+            <div class="rc-desc">ร้าน Okinawan Cuisine สวยงาม เสิร์ฟ Set Course ตามฤดูกาล บรรยากาศดีมาก เหมาะปิดท้ายทริปอย่างมีสไตล์</div>
+            <div class="rc-chips">
+              <span class="rc-chip">🍱 Okinawa Cuisine Course</span>
+              <span class="rc-chip">🍜 Okinawa Soba</span>
+              <span class="rc-chip">🥗 Seasonal Champuru</span>
+            </div>
+            <div class="rc-meta"><span>💴 ¥1,500–2,500</span><span>⏰ 11:00–15:00 (lunch only)</span><span>📍 Naha</span>
+              <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJcSlg7G9p5TQR0kV9LiX1lOY" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">14:30</div>
+          <div class="tl-place">🏨 เช็คเอาท์ Mercure (ก่อน 11:00) → 🛬 Naha Airport</div>
+          <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJjSyLjsRp5TQRkP5WN6rOTFA" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div class="tl-desc">ฝากกระเป๋าที่ Mercure ระหว่างช้อปของฝาก · Tsubogawa Station → Naha Airport ~12 นาที · ซื้อ Pork Tamago ที่สาขาสนามบินเป็นมื้อสุดท้าย</div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-time">16:55</div>
+          <div class="tl-place">✈️ FD231 → Taipei → Bangkok → Chiang Mai</div>
+          <div class="tl-desc">ถึง Chiang Mai เช้าวันที่ 20 มิ.ย. เวลา 07:55</div>
+        </div>
+
+      </div>
+      <div class="food-row">
+        <span class="food-chip">🍳 Manmaru Breakfast</span>
+        <span class="food-chip">🍜 Nuchigafu Lunch</span>
+        <span class="food-chip">🍬 Beni Imo Tart (ของฝาก)</span>
+      </div>
+      <div class="tip-box">💡 กระเป๋าคนละ 7kg! ชั่งน้ำหนักของฝากก่อนออกโรงแรม — Awamori ต้องใส่ checked bag เท่านั้น</div>
+    </div>
+  </div>
+
+  <!-- OPTIONAL: ONSEN -->
+  <div style="margin-bottom:24px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+      <div style="width:38px;height:38px;background:var(--ink);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">♨️</div>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);">ทางเลือกเสริม · Onsen</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:1px;">แวะได้ยืดหยุ่นตามวัน — ไม่ได้ระบุตายตัว</div>
+      </div>
+    </div>
+
+    <div style="background:var(--cream);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+
+      <!-- Header strip -->
+      <div style="background:linear-gradient(135deg,#1a1208 0%,#3a2010 100%);padding:16px 18px 14px;position:relative;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:2px;color:rgba(232,168,76,0.8);font-family:'DM Mono',monospace;margin-bottom:4px;text-transform:uppercase;">Recommended · แนะนำพิเศษ</div>
+        <div style="font-size:18px;font-weight:700;color:#fdf8f0;line-height:1.3;">Ryukyu Onsen Senagajima</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:2px;">"Ryujin no Yu" · 龍神の湯</div>
+        <div style="position:absolute;top:14px;right:16px;"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ_wZV6B5o5TQR4KmUbcNvaIw" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+      </div>
+
+      <!-- Info grid -->
+      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:12px;">
+
+        <div style="font-size:13px;color:#3a2e1a;line-height:1.7;">
+          น้ำพุร้อนธรรมชาติพุ่งจากใต้ดิน <strong style="color:var(--ink)">1,000 เมตร</strong> บนเกาะ Senaga วิว open-air bath ชม<strong style="color:var(--ink)"> sunset เหนือหมู่เกาะ Kerama</strong> และเห็นรันเวย์สนามบิน Naha ไปพร้อมกัน — เป็น onsen ที่ได้รับการยกย่องมากที่สุดในโอกินาว่า
+        </div>
+
+        <!-- Stats row -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px;">
+          <div style="background:var(--food-bg);border:1px solid var(--food-border);border-radius:10px;padding:9px 11px;">
+            <div style="color:var(--muted);font-size:10.5px;margin-bottom:2px;">ค่าเข้า (day visitor)</div>
+            <div style="font-weight:700;color:var(--ink);">¥2,000</div>
+            <div style="color:var(--muted);">ผู้ใหญ่ รวมภาษีแล้ว</div>
+          </div>
+          <div style="background:var(--food-bg);border:1px solid var(--food-border);border-radius:10px;padding:9px 11px;">
+            <div style="color:var(--muted);font-size:10.5px;margin-bottom:2px;">เวลาเปิด</div>
+            <div style="font-weight:700;color:var(--ink);">06:00–00:00</div>
+            <div style="color:var(--muted);">Last entry 23:00</div>
+          </div>
+          <div style="background:var(--food-bg);border:1px solid var(--food-border);border-radius:10px;padding:9px 11px;">
+            <div style="color:var(--muted);font-size:10.5px;margin-bottom:2px;">ระยะจาก Mercure</div>
+            <div style="font-weight:700;color:var(--ink);">~15 กม.</div>
+            <div style="color:var(--muted);">~20 นาที (taxi)</div>
+          </div>
+        </div>
+
+        <!-- Highlights -->
+        <div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:8px;">สิ่งที่มีในนั้น</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span style="background:#fff8f0;border:1px solid #f0c9a0;color:#7a3a10;font-size:12px;padding:4px 10px;border-radius:12px;">🌊 Open-air bath วิวทะเล + Kerama</span>
+            <span style="background:#fff8f0;border:1px solid #f0c9a0;color:#7a3a10;font-size:12px;padding:4px 10px;border-radius:12px;">🛁 Indoor bath (nano water)</span>
+            <span style="background:#fff8f0;border:1px solid #f0c9a0;color:#7a3a10;font-size:12px;padding:4px 10px;border-radius:12px;">🧂 Salt sauna (Loyly)</span>
+            <span style="background:#fff8f0;border:1px solid #f0c9a0;color:#7a3a10;font-size:12px;padding:4px 10px;border-radius:12px;">🪨 Iwayu (Rock bath กลางแจ้ง)</span>
+            <span style="background:#fff8f0;border:1px solid #f0c9a0;color:#7a3a10;font-size:12px;padding:4px 10px;border-radius:12px;">🏺 Tsuboyu (อ่างส่วนตัว)</span>
+            <span style="background:#fff8f0;border:1px solid #f0c9a0;color:#7a3a10;font-size:12px;padding:4px 10px;border-radius:12px;">🧍 Tachiyu (อ่างยืนลึก 120 ซม.)</span>
+            <span style="background:#fff8f0;border:1px solid #f0c9a0;color:#7a3a10;font-size:12px;padding:4px 10px;border-radius:12px;">🥶 Cold bath 17°C</span>
+            <span style="background:#fff8f0;border:1px solid #f0c9a0;color:#7a3a10;font-size:12px;padding:4px 10px;border-radius:12px;">🛌 Neyu (นอนแช่ชมท้องฟ้า)</span>
+            <span style="background:#fff8f0;border:1px solid #f0c9a0;color:#7a3a10;font-size:12px;padding:4px 10px;border-radius:12px;">🧴 ฟรี towel + amenities ครบ</span>
+          </div>
+        </div>
+
+        <!-- When to go -->
+        <div style="background:linear-gradient(135deg,#e8f4fd,#d4eaf8);border-radius:10px;padding:11px 13px;font-size:12.5px;display:flex;gap:8px;align-items:flex-start;">
+          <span style="flex-shrink:0;font-size:15px;">💡</span>
+          <div style="color:#0a3d6e;line-height:1.65;">
+            <strong>แนะนำให้ไปวันที่ 19 มิ.ย. (วันบิน)</strong> — เช็คเอาท์ Mercure ก่อน 11:00 · ฝากกระเป๋าที่โรงแรม · แวะ Senagajima ช่วงบ่าย · ขับหรือ taxi กลับสนามบิน ~10 นาที ก่อนเที่ยวบิน 16:55 · หรือจะแวะวันอื่นก็ได้ เปิดทุกวัน
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div style="font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;">
+          <span>📍</span>
+          <span>174-5 Senaga, Tomigusuku City, Okinawa · Tel: +81-98-851-7167</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ESSENTIALS -->
+  <div class="essentials">
+    <h3>📋 สิ่งที่ต้องเตรียม</h3>
+    <div class="ess-grid">
+      <div class="ess-item"><strong>🏨 โรงแรม</strong>Mercure Okinawa Naha · เช็คอิน 14 มิ.ย. หลัง 14:00 · เช็คเอาท์ 19 มิ.ย. ก่อน 11:00</div>
+      <div class="ess-item"><strong>🚗 รถเช่า</strong>Plumeria Rent-a-Car · MINI Cooper · 16–18 มิ.ย. (3 วัน) · มี IDP + Passport · <a href="https://plumeria-rentacar.co.jp/" target="_blank" style="color:var(--sky)">จองออนไลน์</a> หรือโทร 098-996-3794</div>
+      <div class="ess-item"><strong>💳 เงินสดเยน</strong>ร้านส่วนใหญ่รับแค่ Cash เตรียม ¥50,000–70,000/คน</div>
+      <div class="ess-item"><strong>📅 จองร้านอาหาร</strong>Hobaru + Bacar + Yunangi — จองวันแรกที่ถึงเลย เต็มเร็วมาก</div>
+      <div class="ess-item"><strong>❌ Cancellation deadline</strong>ยกเลิกฟรีได้ถึง 18:00 น. วันที่ 13 มิ.ย. 2026 (วันก่อนบิน)</div>
+      <div class="ess-item"><strong>📱 SIM / WiFi</strong>ซื้อ eSIM Japan ก่อนบิน หรือเช่า Pocket WiFi ที่สนามบิน</div>
+      <div class="ess-item"><strong>☀️ กันแดด + ร่ม</strong>SPF50+ ทุกวัน มิ.ย. แดดแรง + มีฝนบ้าง</div>
+      <div class="ess-item"><strong>🚌 ใน Naha</strong>Yui Rail 1-day pass ¥800 สะดวกมากวันที่ไม่มีรถ</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+</div><!-- /view-itinerary -->
+
+<!-- ══════════════════════════════════════════════════════
+     VIEW: FOOD GUIDE
+══════════════════════════════════════════════════════ -->
+<div class="view" id="view-food">
+<div class="container">
+
+  <!-- STEAK -->
+  <div class="fg-section">
+    <div class="fg-cat-hd">
+      <div class="fg-cat-icon">🥩</div>
+      <div>
+        <div class="fg-cat-title">Steak</div>
+        <div class="fg-cat-sub">วัฒนธรรม Steak มาจากอิทธิพลทหารอเมริกันหลังสงคราม</div>
+      </div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">01</span>
+        <div>
+          <div class="fg-name">Jack's Steak House <span class="rb rb-iconic" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">ICONIC</span></div>
+          <div class="fg-jp" style="margin-top:2px">ดู: DAY 3 มื้อเย็น</div>
+        </div>
+      </div>
+      <div class="fg-desc">สเต็กเฮาส์อเมริกันที่เก่าแก่ที่สุดใน Naha เปิดมาตั้งแต่หลังสงครามโลกครั้งที่ 2 เสิร์ฟ tenderloin บนกระทะร้อน บรรยากาศ Retro American diner</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥2,000–4,000</span>
+        <span class="fg-tag area">📍 Naha ใกล้ Kokusai</span>
+        <span class="fg-tag hours">⏰ 11:00–22:30 (ปิดพุธ)</span>
+        <span class="fg-tag vibe">🇺🇸 Retro diner</span>
+      
+        <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ22ZssJlp5TQR9_xYHgr0hFo" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>No.1 Tenderloin skillet + ชุด Soup & Salad</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">02</span>
+        <div>
+          <div class="fg-name">Steak House 88 <span class="rb rb-iconic" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">WAGYU</span></div>
+          <div class="fg-jp" style="margin-top:2px">ステーキハウス88 · ดู: DAY 4 มื้อเย็น</div>
+        </div>
+      </div>
+      <div class="fg-desc">Wagyu จากฟาร์มตัวเอง สาขา Kokusai Street เป็นสาขาเดียวที่มี Salad Bar ราคาสมเหตุสมผล ไม่ต้องรอนาน</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥2,500–5,000</span>
+        <span class="fg-tag area">📍 Kokusai-dori, Naha</span>
+        <span class="fg-tag hours">⏰ 11:00–23:00</span>
+        <span class="fg-tag vibe">🥗 มี Salad bar</span>
+      
+        <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ2R9RXXpp5TQRHCj78FkhYpU" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Wagyu Sirloin set + Salad bar</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">03</span>
+        <div>
+          <div class="fg-name">Hobaru <span class="rb rb-unique" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">PREMIUM</span></div>
+          <div class="fg-jp" style="margin-top:2px">帆張 · ดู: DAY 5 มื้อเย็น</div>
+        </div>
+      </div>
+      <div class="fg-desc">Teppanyaki ระดับสูงสุดใน Naha ใช้ Yaeyama beef เลี้ยงในโอกินาว่าโดยเฉพาะ นอกจากสเต็กยังมี Agu Pork และผักท้องถิ่น เหมาะมื้อพิเศษ</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥6,000–12,000/คน</span>
+        <span class="fg-tag area">📍 หน้า Okinawa Prefectural Gov.</span>
+        <span class="fg-tag alert">⚠️ จองล่วงหน้า</span>
+        <span class="fg-tag vibe">🌟 Special occasion</span>
+      
+        <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJzdPhS4hp5TQRESZw-vECvsY" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Yaeyama beef teppanyaki course + Agu Pork</span></div>
+    </div>
+  </div>
+
+  <!-- SOBA / OKINAWAN -->
+  <div class="fg-section">
+    <div class="fg-cat-hd">
+      <div class="fg-cat-icon">🍜</div>
+      <div>
+        <div class="fg-cat-title">Okinawa Soba & อาหารหลัก</div>
+        <div class="fg-cat-sub">เส้นหนา ซุปหมูเข้มข้น — เมนูที่ขาดไม่ได้</div>
+      </div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">01</span>
+        <div>
+          <div class="fg-name">Makishi Public Market ชั้น 2 <span class="rb rb-must" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">MUST</span></div>
+          <div class="fg-jp" style="margin-top:2px">第一牧志公設市場 · ดู: DAY 2 มื้อกลางวัน</div>
+        </div>
+      </div>
+      <div class="fg-desc">ระบบ "Lift-up" ที่ดังที่สุด — เลือกปลาสดชั้นล่าง ส่งขึ้นครัวชั้น 2 ปรุงสด เมนูท้องถิ่นแท้ๆ</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥1,000–2,500</span>
+        <span class="fg-tag area">📍 Makishi, Naha</span>
+        <span class="fg-tag hours">⏰ 08:00–21:00</span>
+        <span class="fg-tag vibe">🏮 ตลาดโลคอล</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Mibai sashimi + Luminous shellfish garlic butter + หมูสามชั้น</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">02</span>
+        <div>
+          <div class="fg-name">Mikado <span class="rb rb-local" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">LOCAL</span></div>
+          <div class="fg-jp" style="margin-top:2px">ミカド · ดู: DAY 1 มื้อเย็น</div>
+        </div>
+      </div>
+      <div class="fg-desc">ร้านข้าวโลคอลราคาประหยัด อาหารโอกินาว่าครบทุกเมนู มีเมนูภาษาอังกฤษ เหมาะมื้อแรก</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥700–1,200</span>
+        <span class="fg-tag area">📍 Naha</span>
+        <span class="fg-tag hours">⏰ 10:00–21:00 (ปิดอาทิตย์)</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Okinawa Soba + Goya Champuru + Rafute</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">03</span>
+        <div>
+          <div class="fg-name">Nuchigafu <span class="rb rb-unique" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">BEAUTIFUL</span></div>
+          <div class="fg-jp" style="margin-top:2px">ぬちがふぅ · ดู: DAY 6 มื้อเที่ยง</div>
+        </div>
+      </div>
+      <div class="fg-desc">Okinawan Cuisine Set สวยงาม เมนูตามฤดูกาล เหมาะปิดท้ายทริปอย่างมีสไตล์ เปิดแค่กลางวัน</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥1,500–2,500</span>
+        <span class="fg-tag area">📍 Naha</span>
+        <span class="fg-tag hours">⏰ 11:00–15:00 (lunch only)</span>
+        <span class="fg-tag vibe">📸 ถ่ายรูปสวย</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Okinawa Cuisine Course / มื้อกลางวัน seasonal set</span></div>
+    </div>
+  </div>
+
+  <!-- IZAKAYA -->
+  <div class="fg-section">
+    <div class="fg-cat-hd">
+      <div class="fg-cat-icon">🍶</div>
+      <div>
+        <div class="fg-cat-title">Izakaya โลคอล</div>
+        <div class="fg-cat-sub">ดื่มกินแบบโอกินาว่าแท้ กับคนท้องถิ่น</div>
+      </div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">01</span>
+        <div>
+          <div class="fg-name">Yunangi <span class="rb rb-local" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">LOCAL FAV</span></div>
+          <div class="fg-jp" style="margin-top:2px">ゆうなんぎい · ดู: DAY 2 มื้อเย็น</div>
+        </div>
+      </div>
+      <div class="fg-desc">ไอซากายะบรรยากาศเหมือนบ้าน คนท้องถิ่นนิยมมาก เมนูโอกินาว่าครบ ลอง Umibudo และ Jimami Tofu</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥2,000–3,500/คน</span>
+        <span class="fg-tag hours">⏰ 17:00–21:30 (ปิดอาทิตย์)</span>
+        <span class="fg-tag alert">⚠️ จองล่วงหน้า</span>
+      
+        <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJq6qrMnZp5TQR8Q22HwB-Pbw" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Umibudo + Jimami Tofu + Goya Champuru + Awamori</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">02</span>
+        <div>
+          <div class="fg-name">Parlor Koyaji <span class="rb rb-local" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">LOCAL GEM</span></div>
+          <div class="fg-jp" style="margin-top:2px">パーラーこやじ · ดู: DAY 5 ปิดคืน</div>
+        </div>
+      </div>
+      <div class="fg-desc">ไอซากายะเล็กๆ ซ่อนตัว Mackerel Sushi และ Beef Tendon กับ Tofu ราคาไม่แพง มีเมนูอังกฤษ</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥1,500–2,500/คน</span>
+        <span class="fg-tag hours">⏰ 15:00–22:00</span>
+        <span class="fg-tag vibe">🐟 ปลาสด · ราคาดี</span>
+      
+        <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJLavxvXBp5TQRCIcrtH6CYI0" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Mackerel Sushi + Beef Tendon Tofu + Awamori</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">03</span>
+        <div>
+          <div class="fg-name">Dachibin <span class="rb rb-local" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">IZAKAYA</span></div>
+          <div class="fg-jp" style="margin-top:2px">だちびん · ดู: DAY 1 หลังเย็น</div>
+        </div>
+      </div>
+      <div class="fg-desc">ไอซากายะระดับยอดเยี่ยม เปิดถึงเที่ยงคืน เหมาะนั่งดื่มสบายๆ คืนแรกหลังลงจอด</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥2,500–4,000/คน</span>
+        <span class="fg-tag hours">⏰ 17:00–00:00</span>
+        <span class="fg-tag alert">⚠️ มี surcharge</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Orion draft + Rafute กับแกล้ม + Awamori</span></div>
+    </div>
+  </div>
+
+  <!-- SPECIAL -->
+  <div class="fg-section">
+    <div class="fg-cat-hd">
+      <div class="fg-cat-icon">✨</div>
+      <div>
+        <div class="fg-cat-title">ร้านพิเศษ</div>
+        <div class="fg-cat-sub">โดดเด่น ไม่เหมือนใคร — ควรจองล่วงหน้า</div>
+      </div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">01</span>
+        <div>
+          <div class="fg-name">Bacar <span class="rb rb-unique" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">HIDDEN GEM</span></div>
+          <div class="fg-jp" style="margin-top:2px">พิซซ่าเตาฟืน · สำรอง: คืนไหนก็ได้ใน Naha</div>
+        </div>
+      </div>
+      <div class="fg-desc">พิซซ่าเตาฟืน Neapolitan แป้งหมักนาน 30+ ชั่วโมง ผสมวัตถุดิบท้องถิ่น ระดับ Michelin-worthy ร้านเล็กมาก ต้องจอง</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥4,000–7,000/คน</span>
+        <span class="fg-tag area">📍 Naha</span>
+        <span class="fg-tag alert">⚠️ จองล่วงหน้าเสมอ</span>
+        <span class="fg-tag vibe">🍕 Wood-fired · Fine casual</span>
+      
+        <span><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJtdXi5ndp5TQRuxFzvOjvZfc" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></span></div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Marinara pizza + seasonal appetizer + natural wine</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">02</span>
+        <div>
+          <div class="fg-name">AJITOYA</div>
+          <div class="fg-jp" style="margin-top:2px">Brown Sugar Curry · Kokusai-dori</div>
+        </div>
+      </div>
+      <div class="fg-desc">Okinawan Brown Sugar Curry — แกงกะหรี่ผสมน้ำตาลทรายแดงโอกินาว่า รสชาติเป็นเอกลักษณ์มาก เมนูเด่น Grilled Chicken Curry</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥1,200–2,000</span>
+        <span class="fg-tag area">📍 Kokusai-dori, Naha</span>
+        <span class="fg-tag vibe">🍛 Okinawan Curry · ถ่ายรูปสวย</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Grilled Chicken Brown Sugar Curry set</span></div>
+    </div>
+  </div>
+
+  <!-- FROM VIDEO -->
+  <div class="fg-section">
+    <div class="fg-cat-hd">
+      <div class="fg-cat-icon">🎬</div>
+      <div>
+        <div class="fg-cat-title">จากวิดีโอ · แนะนำเพิ่มเติม</div>
+        <div class="fg-cat-sub">ร้านและเมนูที่แนะนำโดยตรงจากวิดีโอ YouTube Shorts</div>
+      </div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">01</span>
+        <div>
+          <div class="fg-name">Kouri Shrimp <span class="rb rb-must" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">FROM VIDEO</span></div>
+          <div class="fg-jp" style="margin-top:2px">コウリシュリンプ · ดู: DAY 5 มื้อกลางวัน</div>
+        </div>
+      </div>
+      <div class="fg-desc">ร้านกุ้งผัดเนยกระเทียมชื่อดังบนเกาะ Kouri รสชาติเข้มข้นถูกปากคนไทยมาก เสิร์ฟมาร้อนๆ กินกับข้าวริมทะเล วิวสวย</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥1,000–1,800</span>
+        <span class="fg-tag area">📍 Kouri Island</span>
+        <span class="fg-tag hours">⏰ กลางวัน · อาจมีคิว</span>
+        <span class="fg-tag vibe">🦐 คนไทยนิยมมาก</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Garlic Butter Shrimp + ข้าว + บีบมะนาว</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">02</span>
+        <div>
+          <div class="fg-name">Nakijin Soba <span class="rb rb-must" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">FROM VIDEO</span></div>
+          <div class="fg-jp" style="margin-top:2px">今帰仁そば · ดู: DAY 4 มื้อกลางวัน</div>
+        </div>
+      </div>
+      <div class="fg-desc">ร้านโซบะเส้นสดทำเองแถว Churaumi / Nakijin เส้นหนึบกว่าร้านทั่วไป เมนูพิเศษคือ Homemade Pudding ที่ทางร้านทำเองเป็นของหวาน</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥800–1,400</span>
+        <span class="fg-tag area">📍 แถว Nakijin / Motobu ทางเหนือ</span>
+        <span class="fg-tag vibe">🍜 เส้นสดทำเอง</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Nakijin Soba + Homemade Pudding ของหวาน</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">03</span>
+        <div>
+          <div class="fg-name">Gourmet Conveyor Belt Sushi <span class="rb rb-must" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">FROM VIDEO</span></div>
+          <div class="fg-jp" style="margin-top:2px">ดู: DAY 3 มื้อกลางวัน</div>
+        </div>
+      </div>
+      <div class="fg-desc">ร้านซูชิสายพานแถว American Village / Chatan ที่วิดีโอแนะนำว่ารสชาติดีมากเกินราคา ปลาสดจากทะเลโอกินาว่า</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥100–300/จาน</span>
+        <span class="fg-tag area">📍 American Village / Chatan</span>
+        <span class="fg-tag vibe">🍣 ราคาดี · ปลาสด</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>ปลาท้องถิ่นโอกินาว่า + ข้าว + miso soup</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">04</span>
+        <div>
+          <div class="fg-name">Potama — Pork Tamago Onigiri <span class="rb rb-must" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">FROM VIDEO</span></div>
+          <div class="fg-jp" style="margin-top:2px">ポーたま · ดู: DAY 1 ระหว่างเดิน Kokusai</div>
+        </div>
+      </div>
+      <div class="fg-desc">ข้าวปั้นโอกินาว่าสไตล์ร้าน Potama — ใส่ Spam + ไข่ รสเค็มนัว ทำสดทุกลูก มีสาขาบน Kokusai-dori แวะได้เลยวันแรก</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">~¥300/ลูก</span>
+        <span class="fg-tag area">📍 Kokusai-dori / Makishi / สนามบิน</span>
+        <span class="fg-tag hours">⏰ 07:00–20:00</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Pork Tamago Classic / variant ไข่ดาว</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">05</span>
+        <div>
+          <div class="fg-name">Itoman Fish Market <span class="rb rb-must" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">FROM VIDEO</span></div>
+          <div class="fg-jp" style="margin-top:2px">糸満漁業協同組合 · ดู: DAY 2 แวะระหว่างทาง</div>
+        </div>
+      </div>
+      <div class="fg-desc">ตลาดปลาที่ชาวประมง Itoman ขายอาหารทะเลสดราคาถูกตรงจากเรือ มีที่นั่งกินในตลาดได้เลย — อยู่ใกล้ Peace Memorial Park</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">ราคาตลาด</span>
+        <span class="fg-tag area">📍 Itoman ทางใต้ Okinawa</span>
+        <span class="fg-tag hours">⏰ เช้า–บ่าย</span>
+        <span class="fg-tag vibe">🐟 สดจากเรือ · ถูกมาก</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>ปลาสดตามฤดูกาล + ปลาหมึกย่าง + กุ้งสด</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">06</span>
+        <div>
+          <div class="fg-name">Umibudo Soft Cream Café <span class="rb rb-must" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">FROM VIDEO</span></div>
+          <div class="fg-jp" style="margin-top:2px">คาเฟ่สาหร่ายพวงองุ่น · ดู: DAY 4 บ่าย</div>
+        </div>
+      </div>
+      <div class="fg-desc">ดูวิธีเลี้ยง Umibudo จากฟาร์มจริง + ลองเมนูไฮไลท์ Soft Cream ใส่ Umibudo สดๆ รสเค็มเล็กน้อยจากทะเล หาไม่ได้ที่อื่น</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">¥400–700</span>
+        <span class="fg-tag area">📍 แถวเหนือ Okinawa</span>
+        <span class="fg-tag vibe">🍦 Unique · ถ่ายรูปสวย</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Umibudo Soft Cream + Umibudo สด + Ponzu</span></div>
+    </div>
+
+    <div class="fg-card">
+      <div class="fg-card-top">
+        <span class="fg-num">07</span>
+        <div>
+          <div class="fg-name">Agu Pork Shabu <span class="rb rb-must" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">FROM VIDEO</span></div>
+          <div class="fg-jp" style="margin-top:2px">アグー豚しゃぶ · ดู: DAY 5 มื้อเย็น (ที่ Hobaru)</div>
+        </div>
+      </div>
+      <div class="fg-desc">หมู Agu พันธุ์พื้นเมืองโอกินาว่า หาได้เฉพาะที่นี่ เนื้อมีไขมันเยอะแต่ไม่เลี่ยน นิยมทำชาบูจิ้มน้ำซอสไข่ดิบ + ต้นหอม รสชาติหวานธรรมชาติ</div>
+      <div class="fg-meta">
+        <span class="fg-tag price">อยู่ใน Hobaru course</span>
+        <span class="fg-tag area">📍 Naha (Hobaru)</span>
+        <span class="fg-tag alert">⚠️ จองล่วงหน้า</span>
+        <span class="fg-tag vibe">🐷 หาได้เฉพาะโอกินาว่า</span>
+      </div>
+      <div class="fg-order">🍽 สั่งอะไร: <span>Agu Pork Shabu + น้ำจิ้มไข่ดิบ + ต้นหอม</span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VIEW: MUST-EAT
+══════════════════════════════════════════════════════ -->
+<div class="view" id="view-must">
+<div class="container">
+  <div class="fg-cat-hd" style="margin-bottom:18px">
+    <div class="fg-cat-icon">🍙</div>
+    <div>
+      <div class="fg-cat-title">Must-eat & Street Food</div>
+      <div class="fg-cat-sub">ของกินเล่น ของฝาก และอาหารที่ขาดไม่ได้</div>
+    </div>
+  </div>
+  <div class="fg-grid">
+    <div class="fg-item"><div class="fg-item-icon">🍙</div><div class="fg-item-name">Pork Tamago Onigiri</div><div class="fg-item-jp">ポークたまごおにぎり</div><div class="fg-item-desc">ข้าวปั้น SPAM + ไข่ + สาหร่าย ทำสดทุกลูก มีที่ Makishi, American Village, สนามบิน ~¥300</div></div>
+    <div class="fg-item"><div class="fg-item-icon">🍦</div><div class="fg-item-name">Blue Seal Ice Cream</div><div class="fg-item-jp">ブルーシール</div><div class="fg-item-desc">ต้องลองรส Beni Imo (เผือกม่วง) และ Shikuwasa (มะนาวโอกินาว่า) หาได้ทั่วทั้งเกาะ</div></div>
+    <div class="fg-item"><div class="fg-item-icon">🌮</div><div class="fg-item-name">Taco Rice</div><div class="fg-item-jp">タコライス</div><div class="fg-item-desc">อาหาร Fusion ดัง ข้าวราดเนื้อสไตล์ Mexican เกิดจากอิทธิพลทหารอเมริกัน ~¥800</div></div>
+    <div class="fg-item"><div class="fg-item-icon">🫙</div><div class="fg-item-name">Umibudo</div><div class="fg-item-jp">海ぶどう · สาหร่ายองุ่นทะเล</div><div class="fg-item-desc">เม็ดเล็กแตกในปากกรุบกรอบ กินกับ Ponzu sauce เย็นๆ อร่อยมาก</div></div>
+    <div class="fg-item"><div class="fg-item-icon">🍡</div><div class="fg-item-name">Sata Andagi</div><div class="fg-item-jp">サーターアンダーギー</div><div class="fg-item-desc">โดนัทโอกินาว่า แป้งแน่นกรอบนอกนุ่มใน กินร้อนๆ ริมถนน Kokusai ~¥100</div></div>
+    <div class="fg-item"><div class="fg-item-icon">🍬</div><div class="fg-item-name">Beni Imo Tart</div><div class="fg-item-jp">紅芋タルト</div><div class="fg-item-desc">ของฝากยอดนิยมที่สุด ทาร์ตเผือกม่วง ซื้อที่ Okashigoten หรือ Don Quijote ถูกกว่าสนามบิน</div></div>
+    <div class="fg-item"><div class="fg-item-icon">🥬</div><div class="fg-item-name">Goya Champuru</div><div class="fg-item-jp">ゴーヤーチャンプルー</div><div class="fg-item-desc">ผัดมะระกับเต้าหู้ หมู และไข่ เมนูประจำบ้านชาวโอกินาว่า ขม-กลมกล่อม</div></div>
+    <div class="fg-item"><div class="fg-item-icon">🐷</div><div class="fg-item-name">Rafute</div><div class="fg-item-jp">ラフテー</div><div class="fg-item-desc">หมูสามชั้นตุ๋นน้ำตาลดำและ Awamori นานหลายชั่วโมง เนื้อนุ่มละลายในปาก</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VIEW: DRINKS
+══════════════════════════════════════════════════════ -->
+<div class="view" id="view-drinks">
+<div class="container">
+  <div class="fg-cat-hd" style="margin-bottom:18px">
+    <div class="fg-cat-icon">🥃</div>
+    <div>
+      <div class="fg-cat-title">เครื่องดื่มโอกินาว่า</div>
+      <div class="fg-cat-sub">ดื่มอะไรให้เหมือนคนโอกินาว่า</div>
+    </div>
+  </div>
+  <div class="drink-row">
+    <div class="drink-item"><div class="drink-icon">🥃</div><div><div class="drink-name">Awamori <span class="rb rb-must" style="font-size:9px;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:4px">SIGNATURE</span></div><div class="drink-jp">泡盛 · โชชูประจำเกาะ</div><div class="drink-desc">กลั่นจากข้าวไทยบ่มในโอ่งดิน รสเข้มข้น ดื่ม on the rocks หรือผสมน้ำเปล่า — กินกับทุกมื้อที่ไอซากายะได้เลย</div></div></div>
+    <div class="drink-item"><div class="drink-icon">🍺</div><div><div class="drink-name">Orion Beer</div><div class="drink-jp">オリオンビール · เบียร์ประจำเกาะ</div><div class="drink-desc">รสเบาสดชื่น เหมาะกับอากาศร้อน หาได้ทุกร้านและซุปเปอร์มาร์เก็ต — ราคาถูกกว่า Sapporo</div></div></div>
+    <div class="drink-item"><div class="drink-icon">🍋</div><div><div class="drink-name">Shikuwasa Juice</div><div class="drink-jp">シークヮーサー · มะนาวโอกินาว่า</div><div class="drink-desc">เปรี้ยวจัด หอม วิตามิน C สูง ดื่มสดๆ หรือผสม Awamori ซื้อแบบเข้มข้นเป็นของฝากได้</div></div></div>
+    <div class="drink-item"><div class="drink-icon">🫖</div><div><div class="drink-name">Sanpin Tea</div><div class="drink-jp">さんぴん茶 · ชามะลิโอกินาว่า</div><div class="drink-desc">ชามะลิสไตล์โอกินาว่าจากอิทธิพลจีน หาซื้อเป็นกระป๋องในซุปเปอร์มาร์เก็ต ดื่มเย็นๆ สดชื่น</div></div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VIEW: TIPS
+══════════════════════════════════════════════════════ -->
+<div class="view" id="view-tips">
+<div class="container">
+  <div class="fg-cat-hd" style="margin-bottom:18px">
+    <div class="fg-cat-icon">💡</div>
+    <div>
+      <div class="fg-cat-title">เคล็ดลับสำคัญ</div>
+      <div class="fg-cat-sub">รู้ก่อนไปจะได้ไม่พลาดของดี</div>
+    </div>
+  </div>
+  <div class="tip-list">
+    <div class="tip-row"><div class="tip-n">1</div><div class="tip-t"><strong>จองร้านอาหารวันแรกเลย</strong> — Hobaru, Bacar, Yunangi เต็มเร็วมาก จองทันทีที่เช็คอินโรงแรม</div></div>
+    <div class="tip-row"><div class="tip-n">2</div><div class="tip-t"><strong>พกเงินสด Yen</strong> — ร้านโลคอลหลายแห่งรับเฉพาะ cash ควรมี ¥10,000–20,000 ติดตัวทุกวัน</div></div>
+    <div class="tip-row"><div class="tip-n">3</div><div class="tip-t"><strong>Don Quijote Naha</strong> — เปิด 24 ชม. ของฝากราคาถูกกว่าสนามบิน Beni Imo Tart, Awamori, Orion Beer ซื้อที่นี่</div></div>
+    <div class="tip-row"><div class="tip-n">4</div><div class="tip-t"><strong>เวลาร้านอาหาร</strong> — ร้านโลคอลหลายร้านปิดช่วงบ่าย 14:00–17:00 และปิดวันอาทิตย์ เช็คก่อนไปเสมอ</div></div>
+    <div class="tip-row"><div class="tip-n">5</div><div class="tip-t"><strong>น้ำหนักกระเป๋า 7 kg</strong> — ของฝากซื้อได้แต่ต้องระวัง Awamori ต้องใส่ checked bag (ของเหลว) วางแผนตั้งแต่ต้น</div></div>
+    <div class="tip-row"><div class="tip-n">6</div><div class="tip-t"><strong>Tabelog app</strong> — แม่นยำกว่า Google Maps สำหรับร้านโลคอลญี่ปุ่น ดาวน์โหลดก่อนบินดีมาก</div></div>
+    <div class="tip-row"><div class="tip-n">7</div><div class="tip-t"><strong>Konbini มีของโอกินาว่าพิเศษ</strong> — FamilyMart / Lawson มีขนมและอาหารโลคอลเฉพาะโอกินาว่า เช่น Okinawa Soba cup</div></div>
+    <div class="tip-row"><div class="tip-n">8</div><div class="tip-t"><strong>ห้ามนำผลไม้เข้าโอกินาว่า</strong> — สนามบิน Naha มีหมาตรวจพิเศษ ทิ้งผลไม้ก่อนผ่าน customs ทุกครั้ง</div></div>
+  </div>
+</div>
+</div>
+
+<script>
+function showView(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggle(hd) {
+  const card = hd.closest('.day-card');
+  card.classList.toggle('open');
+}
+</script>
+</body>
+</html>
