@@ -258,6 +258,20 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
 .map-link:hover { background: #c5d8fd; }
 .map-link svg { flex-shrink: 0; }
 
+
+/* ─── TRANSPORT BADGE ─── */
+.transport {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; font-weight: 500;
+  padding: 3px 10px; border-radius: 10px; margin-top: 5px;
+  font-family: var(--font-sans);
+}
+.t-walk  { background:#e8f5e9; color:#1b5e20; border:1px solid #a5d6a7; }
+.t-rail  { background:#e3f2fd; color:#0d47a1; border:1px solid #90caf9; }
+.t-taxi  { background:#fff8e1; color:#e65100; border:1px solid #ffcc80; }
+.t-car   { background:#f3e5f5; color:#4a148c; border:1px solid #ce93d8; }
+.t-walk-rail { background:#e8eaf6; color:#1a237e; border:1px solid #9fa8da; }
+
 </style>
 </head>
 <body>
@@ -355,6 +369,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🛬 ถึง Naha Airport → เช็คอิน</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJjSyLjsRp5TQRkP5WN6rOTFA" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">นั่ง Yui Rail จากสนามบินเข้าเมือง ~15 นาที ซื้อ 1-day pass ¥800</div>
+          <div><span class="transport t-rail">🚃 Yui Rail → Tsubogawa · ~12 นาที · ¥260</span></div>
         </div>
 
         <div class="tl-item">
@@ -362,6 +377,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🛍️ Kokusai-dori Street</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ-w8fcHdp5TQR_PlKZmQhehM" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">ถนนช้อปปิ้ง 1.6 กม. เต็มไปด้วยร้านของฝาก อาหารข้างทาง และบรรยากาศโอกินาว่าแท้ๆ</div>
+          <div><span class="transport t-walk">🚶 เดินจากโรงแรม Mercure · ~10 นาที · 0.8 กม.</span></div>
         </div>
 
         <div class="tl-item food-item">
@@ -370,6 +386,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Potama <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ポーたま · Pork Tamago Onigiri</span></div>
+          <div><span class="transport t-walk">🚶 เดินต่อบน Kokusai-dori · ไม่ต้องเดินทาง</span></div>
               <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span><span class="rb rb-local">STREET FOOD</span></div>
             </div>
             <div class="rc-desc">ข้าวปั้นสไตล์โอกินาว่า ใส่ Spam + ไข่ รสเค็มนัว ทำสดทุกลูก มีสาขาบน Kokusai-dori เดินแล้วแวะได้เลย — กินเป็นของว่างระหว่างรอมื้อเย็น</div>
@@ -390,6 +407,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">19:00</div>
           <div class="tl-place">🍜 มื้อเย็นแรก — Okinawa Soba</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJLbLQNZ1p5TQRA4kxN6fqHTc" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-walk">🚶 เดินใน Kokusai-dori · ~5 นาที</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Mikado <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ミカド</span></div>
@@ -414,6 +432,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Dachibin <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">だちびん</span></div>
+          <div><span class="transport t-walk">🚶 เดินใน Naha · ~10 นาที · 0.7 กม.</span></div>
               <div class="rc-badges"><span class="rb rb-local">IZAKAYA</span></div>
             </div>
             <div class="rc-desc">ไอซากายะระดับยอดเยี่ยม บรรยากาศโอกินาว่าแท้ เปิดถึงเที่ยงคืน เหมาะนั่งดื่มคลายเหนื่อยจากเที่ยวบิน</div>
@@ -461,12 +480,14 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🌊 Okinawa World & ถ้ำ Gyokusendo</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJa3ifUYVp5TQR3QZD1tyLml4" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">ถ้ำหินงอก 890 เมตร + หมู่บ้านวัฒนธรรม Ryukyu ชม Habu-sake ใช้เวลา ~2 ชม. · 🚖 <strong>แท็กซี่ GO/DiDi จาก Mercure ~30 นาที ~¥2,000</strong></div>
+          <div><span class="transport t-taxi">🚖 GO/DiDi จาก Mercure · ~30 นาที · 18 กม. · ~¥2,000</span></div>
         </div>
 
         <div class="tl-item food-item">
           <div class="tl-time">11:30</div>
           <div class="tl-place">🐟 Itoman Fish Market</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJnfH0IcJn5TQRFTMsWWcjFlg" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-taxi">🚖 แท็กซี่จาก Okinawa World · ~10 นาที · 8 กม. · ~¥1,000</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">ตลาดปลาอิโตมัง <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">糸満漁業協同組合</span></div>
@@ -489,6 +510,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🏯 Shuri Castle (UNESCO)</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJZ9v0bP5r5TQRi0-esrqficA" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">ปราสาทมรดกโลก ศูนย์กลางอาณาจักร Ryukyu เปิด 8:30–19:00 ค่าเข้า ¥400 · 🚖 แท็กซี่กลับ Naha ~¥3,000 → แท็กซี่ต่อไป Shuri</div>
+          <div><span class="transport t-taxi">🚖 แท็กซี่จาก Itoman · ~30 นาที · 22 กม. · ~¥3,000</span></div>
         </div>
 
         <div class="sec-label">🍱 มื้อเย็น · Makishi Market</div>
@@ -497,6 +519,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">16:00</div>
           <div class="tl-place">🐟 Makishi Public Market</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJy1Zdsr9p5TQR2ET-2o69ZKg" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-walk-rail">🚃🚶 Yui Rail จาก Shuri → Makishi · ~10 นาที · ¥230</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Makishi Public Market ชั้น 2 <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">第一牧志公設市場</span></div>
@@ -518,6 +541,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Yunangi <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ゆうなんぎい</span></div>
+          <div><span class="transport t-walk">🚶 เดินจาก Makishi · ~5 นาที · 0.4 กม.</span></div>
               <div class="rc-badges"><span class="rb rb-local">LOCAL FAV</span><span class="rb rb-book">จองล่วงหน้า</span></div>
             </div>
             <div class="rc-desc">ไอซากายะบรรยากาศเหมือนบ้าน คนท้องถิ่นนิยมมาก เมนูโอกินาว่าครบ ลอง Umibudo สาหร่ายองุ่นทะเล และ Jimami Tofu</div>
@@ -563,6 +587,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🚗 รับรถ MINI — Plumeria Rent-a-Car</div>
           <div style="margin-top:4px"><a class="map-link" href="https://plumeria-rentacar.co.jp/" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> Plumeria Rent-a-Car</a></div>
           <div class="tl-desc">โทรแจ้ง Plumeria เมื่อถึงสนามบิน (098-996-3710) · รถรับฟรี One-by-One จาก Naha Airport → ร้าน · ใช้ต่อเนื่อง 3 วัน 16–18 มิ.ย. · คืนรถวันที่ 18 · เปิด 09:30–20:00</div>
+          <div><span class="transport t-taxi">🚖 GO/DiDi จาก Mercure → สนามบิน · ~15 นาที · ~¥1,500</span></div>
           
         </div>
 
@@ -585,6 +610,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🌊 Cape Manzamo</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ-adBh3gD5TQRGFnnzG897N8" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">หน้าผาหินรูปงวงช้างชมทะเล East China Sea จุดถ่ายรูปสุดฮิต สวยมากช่วงเช้า</div>
+          <div><span class="transport t-car">🚗 ขับจากสนามบิน · ~50 นาที · 38 กม.</span></div>
         </div>
 
         <div class="tl-item">
@@ -592,6 +618,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🇺🇸 Mihama American Village · Chatan</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJzZoVCAUT5TQRzIueHYt83hs" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">ย่านผสมสไตล์อเมริกัน-โอกินาว่า ร้านกาแฟ บูติค วิวหาด Ferris wheel</div>
+          <div><span class="transport t-car">🚗 ขับจาก Cape Manzamo · ~15 นาที · 12 กม.</span></div>
         </div>
 
         <div class="sec-label">🌮 มื้อกลางวัน · American Village</div>
@@ -600,6 +627,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">12:30</div>
           <div class="tl-place">🍣 Gourmet Conveyor Belt Sushi — American Village</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJzZoVCAUT5TQRzIueHYt83hs" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-walk">🚶 เดินใน American Village · ~3 นาที</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Gourmet Conveyor Belt Sushi (แถว American Village)</div>
@@ -623,6 +651,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Blue Seal Ice Cream <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ブルーシール</span></div>
+          <div><span class="transport t-walk">🚶 เดินใน American Village · ~5 นาที</span></div>
               <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span></div>
             </div>
             <div class="rc-desc">วิดีโอแนะนำหลายรส — นอกจาก Beni Imo (เผือกม่วง) ที่ฮิตอยู่แล้ว ลองรส Sea Salt (เกลือ) และ Pistachio ด้วย ร้านอยู่ทั่ว American Village</div>
@@ -642,6 +671,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🏄 Araha Beach / Sunset Beach</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJJdFU6tsT5TQRFtGMxK9GlzU" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">หาดใกล้ American Village น้ำสวย ว่ายน้ำ หรือเล่น SUP Board</div>
+          <div><span class="transport t-car">🚗 ขับจาก American Village · ~5 นาที · 1.5 กม.</span></div>
         </div>
 
         <div class="sec-label">🌅 มื้อเย็น · ชม Sunset</div>
@@ -650,6 +680,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">18:00</div>
           <div class="tl-place">🥩 ดินเนอร์ริมหาด — Jack's Steak House</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ22ZssJlp5TQR9_xYHgr0hFo" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-car">🚗 ขับกลับ Naha · ~40 นาที · 28 กม.</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Jack's Steak House</div>
@@ -696,6 +727,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">07:30</div>
           <div class="tl-place">🚗 ออกเดินทางเหนือ</div>
           <div class="tl-desc">ขับขึ้นเหนือตาม Okinawa Expressway ~1.5 ชม. ถึง Motobu</div>
+          <div><span class="transport t-car">🚗 ออกจาก Naha · ทางด่วน Naha IC → Kyoda IC</span></div>
         </div>
 
         <div class="tl-item">
@@ -703,6 +735,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🐋 Churaumi Aquarium</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJPZ5hUjH65DQR_p_dD3CmCOo" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">1 ใน 3 อควาเรียมใหญ่ที่สุดในโลก ตู้ Kuroshio Sea โชว์ whale shark + manta ray ค่าเข้า ¥2,180</div>
+          <div><span class="transport t-car">🚗 ขับจาก Naha · ~90 นาที · 96 กม. (ทางด่วน)</span></div>
         </div>
 
         <div class="tl-item">
@@ -710,6 +743,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🏖️ Emerald Beach</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ28eWwqj75DQRTFD9otdbYL8" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">หาดในโอเชียนพาร์คติดอควาเรียม น้ำใสเขียวมรกต ว่ายน้ำฟรี</div>
+          <div><span class="transport t-walk">🚶 เดินจากอควาเรียม · ~5 นาที · ติดกัน</span></div>
         </div>
 
         <div class="sec-label">🍍 มื้อกลางวัน · ทางเหนือ</div>
@@ -720,6 +754,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Nakijin Soba <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">今帰仁そば</span></div>
+          <div><span class="transport t-car">🚗 ขับจาก Emerald Beach · ~20 นาที · 15 กม.</span></div>
               <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span><span class="rb rb-local">HOMEMADE</span></div>
             </div>
             <div class="rc-desc">ร้านโซบะเส้นสดทำเองแถว Churaumi / Nakijin ที่วิดีโอแนะนำโดยเฉพาะ เส้นหนึบกว่าร้านอื่น และนอกจากโซบะยังมี pudding ทำเองเป็นของหวานเด็ดประจำร้าน</div>
@@ -740,6 +775,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">คาเฟ่ / ฟาร์ม Umibudo ทางเหนือ</div>
+          <div><span class="transport t-car">🚗 ขับแถว Motobu · ~10 นาที · 5 กม.</span></div>
               <div class="rc-badges"><span class="rb rb-must">FROM VIDEO</span><span class="rb rb-unique">UNIQUE</span></div>
             </div>
             <div class="rc-desc">ดูวิธีการเลี้ยงสาหร่ายพวงองุ่น Umibudo จากฟาร์มจริงๆ และลองเมนูไฮไลท์คือ Soft Cream ใส่ Umibudo สดๆ — รสชาติแปลกใหม่ เค็มนิดๆ จากทะเล เป็นประสบการณ์ที่หาไม่ได้ที่อื่น</div>
@@ -758,6 +794,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🏯 Nakijin Castle (UNESCO)</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJk_KWO7b55DQRF6wOVeWpIDE" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">ปราสาทริมหน้าผาทะเล สวยมาก มรดกโลก ไม่ค่อยมีนักท่องเที่ยว</div>
+          <div><span class="transport t-car">🚗 ขับจาก Nakijin Soba · ~5 นาที · 3 กม.</span></div>
         </div>
 
         <div class="sec-label">🥩 มื้อเย็น · กลับ Naha</div>
@@ -766,6 +803,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">19:30</div>
           <div class="tl-place">🥩 ดินเนอร์พิเศษ — Steak House 88</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ2R9RXXpp5TQRHCj78FkhYpU" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-car">🚗 ขับกลับ Naha · ~90 นาที · 96 กม. (ทางด่วน)</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Steak House 88 <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ステーキハウス88 国際通り店</span></div>
@@ -814,12 +852,14 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🌉 Kouri Bridge → Kouri Island</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJyy0FRAhZ5DQRIfztLp8vdWc" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">วิวสะพาน Kouri Bridge เขียวฟ้าสวยที่สุดในโอกินาว่า ถ่ายรูปจากสะพาน</div>
+          <div><span class="transport t-car">🚗 ขับจาก Naha · ~80 นาที · 88 กม. (ทางด่วน)</span></div>
         </div>
 
         <div class="tl-item">
           <div class="tl-time">10:00</div>
           <div class="tl-place">🐚 Kouri Ocean Tower + Tinu Beach (Heart Rock)</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJf3Y9SjJY5DQRIZUnKV_U1Hg" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-car">🚗 ขับบนเกาะ Kouri · ~5 นาที · 2 กม.</span></div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJEx3cOjJY5DQRJM-BcuwWU-g" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">หอชมวิว 360° + หาดลับหินรูปหัวใจ จุด Instagrammable สุดฮิต ทะเลใสมาก</div>
         </div>
@@ -830,6 +870,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">12:30</div>
           <div class="tl-place">🦐 มื้อกลางวันบนเกาะ — Kouri Shrimp</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJcep34MxZ5DQR5VjNV0a8HWg" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-walk">🚶 เดินบนเกาะ · ~5 นาที · 0.3 กม.</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Kouri Shrimp <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">コウリシュリンプ</span></div>
@@ -852,6 +893,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">14:30</div>
           <div class="tl-place">🌊 Snorkeling · ว่ายน้ำ</div>
           <div class="tl-desc">น้ำรอบเกาะ Kouri ใสมาก ดำน้ำตื้นดูปะการัง หรือนั่งเล่นน้ำริมหาด</div>
+          <div><span class="transport t-walk">🚶 เดินลงหาด · ~2 นาที</span></div>
         </div>
 
         <div class="tl-item">
@@ -859,6 +901,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🚗 คืนรถ MINI — Plumeria Rent-a-Car</div>
           <div style="margin-top:4px"><a class="map-link" href="https://plumeria-rentacar.co.jp/" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> Plumeria Rent-a-Car</a></div>
           <div class="tl-desc">ขับกลับ Naha ~90 กม. ~1.5 ชม. · คืนรถที่ Plumeria สาขา Naha Airport · ร้านรับส่งกลับโรงแรมได้ (บริการ hotel delivery ย่าน Naha) · ครบ 3 วัน 16–18 มิ.ย.</div>
+          <div><span class="transport t-car">🚗 ขับจาก Kouri กลับ Naha · ~80 นาที · 88 กม.</span></div>
         </div>
 
         <div class="sec-label">🐷 มื้อเย็น · คืนพิเศษ Naha</div>
@@ -867,6 +910,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">19:00</div>
           <div class="tl-place">🐷 ดินเนอร์พิเศษ — Hobaru Teppanyaki</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJzdPhS4hp5TQRESZw-vECvsY" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-walk">🚶 เดินจาก Mercure · ~12 นาที · 1 กม.</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Hobaru <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">帆張</span></div>
@@ -889,6 +933,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">21:30</div>
           <div class="tl-place">🍣 ปิดคืน — Parlor Koyaji</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJLavxvXBp5TQRCIcrtH6CYI0" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-walk">🚶 เดินใน Naha · ~5 นาที · 0.4 กม.</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Parlor Koyaji <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">パーラーこやじ</span></div>
@@ -937,6 +982,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Manmaru Cafe <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">まるたま</span></div>
+          <div><span class="transport t-walk">🚶 เดินจาก Mercure · ~8 นาที · 0.6 กม.</span></div>
               <div class="rc-badges"><span class="rb rb-local">BREAKFAST FAV</span></div>
             </div>
             <div class="rc-desc">ร้านอาหารเช้ายอดนิยมในหมู่คนท้องถิ่น เมนูผสมโอกินาว่าดั้งเดิม-สมัยใหม่ บรรยากาศอบอุ่น</div>
@@ -954,12 +1000,14 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-place">🛒 ช้อปของฝาก — Kokusai-dori + Don Quijote</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJNcZYDXpp5TQR022qR4dmEnw" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
           <div class="tl-desc">ซื้อ Beni Imo Tart, Chinsuko, Shikuwasa concentrate — ราคาถูกกว่าสนามบิน</div>
+          <div><span class="transport t-walk">🚶 เดินจาก Manmaru · ~10 นาที · 0.7 กม.</span></div>
         </div>
 
         <div class="tl-item">
           <div class="tl-time">11:00</div>
           <div class="tl-place">🎨 Ryukyu Glass / Yachimun Pottery</div>
           <div class="tl-desc">แก้ว Ryukyu หรือเซรามิก Yachimun ของฝากสวยไม่ซ้ำใคร</div>
+          <div><span class="transport t-walk">🚶 เดินใน Kokusai-dori · ~5 นาที</span></div>
         </div>
 
         <div class="sec-label">🍜 มื้อสุดท้ายในโอกินาว่า</div>
@@ -968,6 +1016,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">12:30</div>
           <div class="tl-place">🍜 มื้อสุดท้าย — Nuchigafu</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJcSlg7G9p5TQR0kV9LiX1lOY" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-walk">🚶 เดินจาก Kokusai · ~10 นาที · 0.8 กม.</span></div>
           <div class="rc">
             <div class="rc-top">
               <div class="rc-name">Nuchigafu <span style="font-weight:400;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">ぬちがふぅ</span></div>
@@ -988,6 +1037,7 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
           <div class="tl-time">14:30</div>
           <div class="tl-place">🏨 เช็คเอาท์ Mercure (ก่อน 11:00) → 🛬 Naha Airport</div>
           <div style="margin-top:4px"><a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJjSyLjsRp5TQRkP5WN6rOTFA" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a></div>
+          <div><span class="transport t-rail">🚃 Yui Rail จาก Tsubogawa → สนามบิน · ~12 นาที · ¥260</span></div>
           <div class="tl-desc">ฝากกระเป๋าที่ Mercure ระหว่างช้อปของฝาก · Tsubogawa Station → Naha Airport ~12 นาที · ซื้อ Pork Tamago ที่สาขาสนามบินเป็นมื้อสุดท้าย</div>
         </div>
 
