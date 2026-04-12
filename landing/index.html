@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Projection — Directional Drilling</title>
+  <style>
+    /* ─── Custom Properties ─────────────────────────────────────── */
+    :root {
+      --bg-page:      #0d1520;
+      --bg-card:      #1a2332;
+      --bg-input:     #0f1c2d;
+      --bg-header:    #0a1018;
+      --border:       #2c3e55;
+      --border-focus: #3b82f6;
+      --text-main:    #e2e8f0;
+      --text-muted:   #7a90a8;
+      --text-label:   #94a8be;
+      --accent:       #3b82f6;
+      --accent-dim:   rgba(59,130,246,0.15);
+      --mono:         'Courier New', Courier, monospace;
+      --radius:       6px;
+
+      --dls-green:    #22c55e;
+      --dls-green-bg: rgba(34,197,94,0.15);
+      --dls-yellow:   #eab308;
+      --dls-yellow-bg:rgba(234,179,8,0.15);
+      --dls-red:      #ef4444;
+      --dls-red-bg:   rgba(239,68,68,0.15);
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      background: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .layout { flex: 1; }
+
+    /* ─── Header ────────────────────────────────────────────────── */
+    header {
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    .header-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 56px;
+    }
+    .header-icon {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+    }
+    .header-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-left: 1px solid var(--border);
+      padding-left: 14px;
+      margin-left: 4px;
+    }
+
+    /* ─── Page Layout ───────────────────────────────────────────── */
+    .layout {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ─── Panel / Card ──────────────────────────────────────────── */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+    .panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ─── Fieldset ──────────────────────────────────────────────── */
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px 10px;
+      margin-bottom: 12px;
+    }
+    fieldset:last-child { margin-bottom: 0; }
+    legend {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 0 6px;
+    }
+
+    /* ─── Input Rows ────────────────────────────────────────────── */
+    .field-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .field-row label {
+      font-size: 12px;
+      color: var(--text-label);
+      white-space: nowrap;
+      flex: 1;
+    }
+    .field-row .unit {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* ─── Number Inputs ─────────────────────────────────────────── */
+    input[type="number"] {
+      width: 90px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-main);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 5px 8px;
+      text-align: right;
+      outline: none;
+      transition: border-color 0.15s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 2px var(--accent-dim); }
+    input[type="number"][readonly] {
+      color: var(--text-muted);
+      border-style: dashed;
+      cursor: default;
+    }
+
+    /* ─── Slider (TD Depth) ─────────────────────────────────────── */
+    .slider-row {
+      margin-top: 8px;
+    }
+    .slider-row label {
+      font-size: 12px;
+      color: var(--text-label);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .slider-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--bg-card);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 16px; height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--bg-card);
+    }
+    .slider-range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      margin-top: 3px;
+    }
+
+    /* ─── Footage-to-TD summary card ───────────────────────────── */
+    .footage-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-page);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 12px 18px;
+      margin-bottom: 14px;
+    }
+    .footage-summary .fs-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .footage-summary .fs-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .footage-summary .fs-value {
+      font-family: var(--mono);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+    .footage-summary .fs-unit {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    /* ─── Results Table ─────────────────────────────────────────── */
+    .table-scroll { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 12.5px;
+    }
+    thead tr {
+      background: var(--bg-page);
+      border-bottom: 2px solid var(--border);
+    }
+    th {
+      padding: 10px 12px;
+      text-align: right;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    th:first-child { text-align: left; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody tr:last-child { border-bottom: none; }
+    td {
+      padding: 12px 12px;
+      text-align: right;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+    td:first-child { text-align: left; }
+
+    /* Station label styles */
+    .station-label {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .station-actual  { color: #64b5f6; }
+    .station-proj    { color: #81c784; }
+    .station-td      { color: #ff8a65; }
+
+    .dash-cell { color: var(--text-muted); }
+
+    /* ─── DLS Badge ─────────────────────────────────────────────── */
+    .dls-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 12.5px;
+      min-width: 60px;
+      text-align: center;
+    }
+    .dls-green  { color: var(--dls-green);  background: var(--dls-green-bg); }
+    .dls-yellow { color: var(--dls-yellow); background: var(--dls-yellow-bg); }
+    .dls-red    { color: var(--dls-red);    background: var(--dls-red-bg); }
+    .dls-dash   { color: var(--text-muted); }
+
+    /* ─── DLS Legend ────────────────────────────────────────────── */
+    .dls-legend {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+    }
+    .dls-legend span { display: flex; align-items: center; gap: 6px; }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+    }
+    .legend-dot.green  { background: var(--dls-green); }
+    .legend-dot.yellow { background: var(--dls-yellow); }
+    .legend-dot.red    { background: var(--dls-red); }
+    .dls-legend .legend-label { color: var(--text-muted); }
+
+    /* ─── Warning badge ─────────────────────────────────────────── */
+    .warn { color: var(--dls-red); font-size: 10px; margin-left: 4px; }
+
+    /* ─── Unit toggle buttons ───────────────────────────────────── */
+    .unit-group {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .unit-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 5px 13px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      letter-spacing: 0.5px;
+      line-height: 1;
+      font-family: var(--mono);
+    }
+    .unit-btn + .unit-btn { border-left: 1px solid var(--border); }
+    .unit-btn.active      { background: var(--accent); color: #fff; }
+    .unit-btn:not(.active):hover { background: rgba(255,255,255,0.06); color: var(--text-main); }
+
+    /* ─── Footer ────────────────────────────────────────────────── */
+    footer {
+      background: var(--bg-header);
+      border-top: 1px solid var(--border);
+      padding: 0 24px;
+      margin-top: 8px;
+    }
+    .footer-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 40px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .footer-sep { color: var(--border); }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    footer a:hover { text-decoration: underline; }
+
+    /* ─── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .layout { padding: 12px; gap: 12px; }
+      .header-sub { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-icon">⛛</div>
+    <h1>Directional Drilling — Landing Projection</h1>
+    <span class="header-sub">Minimum Curvature Method</span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ══════════════ INPUT PANEL ══════════════ -->
+  <div class="panel" id="inputPanel">
+    <p class="panel-title">Survey &amp; TD Inputs</p>
+
+    <!-- Units -->
+    <fieldset>
+      <legend>Units</legend>
+      <div class="field-row">
+        <label>Depth</label>
+        <div class="unit-group">
+          <button class="unit-btn active" data-group="depth" data-value="ft">ft</button>
+          <button class="unit-btn"        data-group="depth" data-value="m">m</button>
+        </div>
+      </div>
+      <div class="field-row" id="dlsUnitRow" style="display:none">
+        <label>DLS Rate</label>
+        <div class="unit-group">
+          <button class="unit-btn active" data-group="dls" data-value="30m">deg/30m</button>
+          <button class="unit-btn"        data-group="dls" data-value="10m">deg/10m</button>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Last Actual Survey -->
+    <fieldset>
+      <legend>Last Actual Survey</legend>
+      <div class="field-row">
+        <label for="actualDepth">Depth</label>
+        <input type="number" id="actualDepth" value="3827.11" step="0.01">
+        <span class="unit depth-unit">ft</span>
+      </div>
+      <div class="field-row">
+        <label for="actualInc">Inclination</label>
+        <input type="number" id="actualInc" value="87" step="0.01" min="0" max="180">
+        <span class="unit">deg</span>
+      </div>
+      <div class="field-row">
+        <label for="actualAzi">Azimuth</label>
+        <input type="number" id="actualAzi" value="20" step="0.01" min="0" max="360">
+        <span class="unit">deg</span>
+      </div>
+    </fieldset>
+
+    <!-- D&I Sensor -->
+    <fieldset>
+      <legend>D&amp;I Sensor</legend>
+      <div class="field-row">
+        <label for="diOffset">D&amp;I Offset</label>
+        <input type="number" id="diOffset" value="65.72" step="0.01" min="0">
+        <span class="unit depth-unit">ft</span>
+      </div>
+      <div class="field-row">
+        <label for="bitDepth">Current Bit Depth</label>
+        <input type="number" id="bitDepth" value="3850" step="0.01" min="0">
+        <span class="unit depth-unit">ft</span>
+      </div>
+    </fieldset>
+
+    <!-- Projected Last Survey -->
+    <fieldset>
+      <legend>Projected Last Survey</legend>
+      <div class="field-row">
+        <label>Depth <small style="color:var(--text-muted)">(auto)</small></label>
+        <input type="number" id="projDepth" readonly tabindex="-1">
+        <span class="unit depth-unit">ft</span>
+      </div>
+      <div class="field-row">
+        <label for="projInc">Inclination</label>
+        <input type="number" id="projInc" value="89" step="0.01" min="0" max="180">
+        <span class="unit">deg</span>
+      </div>
+      <div class="field-row">
+        <label for="projAzi">Azimuth</label>
+        <input type="number" id="projAzi" value="20" step="0.01" min="0" max="360">
+        <span class="unit">deg</span>
+      </div>
+    </fieldset>
+
+    <!-- TD Specification -->
+    <fieldset>
+      <legend>TD Specification</legend>
+      <div class="slider-row">
+        <label for="tdSlider">TD Depth <span id="tdSliderVal" style="color:var(--accent);font-family:var(--mono)">3922</span> <span id="tdDepthUnit" class="depth-unit">ft</span></label>
+        <div class="slider-controls">
+          <input type="range" id="tdSlider" min="3822" max="4022" step="1" value="3922">
+          <input type="number" id="tdDepth" value="3922" step="1" style="width:80px">
+        </div>
+        <div class="slider-range-labels">
+          <span id="sliderMin">3822</span><span id="sliderMax">4022</span>
+        </div>
+      </div>
+      <div class="field-row" style="margin-top:10px">
+        <label for="tdInc">Inclination</label>
+        <input type="number" id="tdInc" value="90" step="0.01" min="0" max="180">
+        <span class="unit">deg</span>
+      </div>
+      <div class="field-row">
+        <label for="tdAzi">Azimuth</label>
+        <input type="number" id="tdAzi" value="20" step="0.01" min="0" max="360">
+        <span class="unit">deg</span>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- ══════════════ RESULTS PANEL ══════════════ -->
+  <div class="panel" id="resultsPanel">
+    <p class="panel-title">Projection Results</p>
+
+    <!-- Footage summary cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+
+      <div class="footage-summary" style="margin-bottom:0">
+        <div>
+          <div class="fs-label">Bit → Proj Survey</div>
+          <div class="fs-sub">Bit Depth → Proj Last Survey</div>
+        </div>
+        <div>
+          <span class="fs-value" id="footageBitToProj">—</span>
+          <span class="fs-unit footage-unit">ft</span>
+        </div>
+      </div>
+
+      <div class="footage-summary" style="margin-bottom:0">
+        <div>
+          <div class="fs-label">Bit → TD</div>
+          <div class="fs-sub">Bit Depth → Projected TD</div>
+        </div>
+        <div>
+          <span class="fs-value" id="footageBitToTD">—</span>
+          <span class="fs-unit footage-unit">ft</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="table-scroll">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th>Station</th>
+            <th id="th-depth">Depth<br>(ft)</th>
+            <th>Inc<br>(deg)</th>
+            <th>Azi<br>(deg)</th>
+            <th id="th-br">Build Rate<br>(deg/100ft)</th>
+            <th id="th-tr">Turn Rate<br>(deg/100ft)</th>
+            <th id="th-dls">DLS<br>(deg/100ft)</th>
+            <th id="th-footage">Footage<br>(ft)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="row-actual">
+            <td><span class="station-label station-actual">Actual Survey</span></td>
+            <td id="r0-depth">—</td>
+            <td id="r0-inc">—</td>
+            <td id="r0-azi">—</td>
+            <td class="dash-cell">—</td>
+            <td class="dash-cell">—</td>
+            <td class="dash-cell">—</td>
+            <td class="dash-cell">—</td>
+          </tr>
+          <tr id="row-proj">
+            <td><span class="station-label station-proj">Proj Last Survey</span></td>
+            <td id="r1-depth">—</td>
+            <td id="r1-inc">—</td>
+            <td id="r1-azi">—</td>
+            <td id="r1-br">—</td>
+            <td id="r1-tr">—</td>
+            <td id="r1-dls">—</td>
+            <td id="r1-ft">—</td>
+          </tr>
+          <tr id="row-td">
+            <td><span class="station-label station-td">Projection to TD</span></td>
+            <td id="r2-depth">—</td>
+            <td id="r2-inc">—</td>
+            <td id="r2-azi">—</td>
+            <td id="r2-br">—</td>
+            <td id="r2-tr">—</td>
+            <td id="r2-dls">—</td>
+            <td id="r2-ft">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dls-legend">
+      <span><div class="legend-dot green"></div><span  class="legend-label" id="legend-low"> &lt; 3 deg/100ft — Low</span></span>
+      <span><div class="legend-dot yellow"></div><span class="legend-label" id="legend-mid">3 – 6 deg/100ft — Moderate</span></span>
+      <span><div class="legend-dot red"></div><span    class="legend-label" id="legend-high"> &gt; 6 deg/100ft — High</span></span>
+    </div>
+  </div>
+
+</div><!-- /.layout -->
+
+<footer>
+  <div class="footer-inner">
+    <span>Developed by <a href="https://www.ronnarong.dev" target="_blank" rel="noopener">ronnarong.dev</a></span>
+    <span class="footer-sep">·</span>
+    <span>Version 1.0</span>
+    <span class="footer-sep">·</span>
+    <span>13-Mar-2026</span>
+    <span class="footer-sep">·</span>
+    <span>Co-authored with Claude Code</span>
+  </div>
+</footer>
+
+<script>
+  // ─── Unit state ───────────────────────────────────────────────
+  let depthUnit = 'ft';    // 'ft' | 'm'
+  let dlsUnit   = '100ft'; // '100ft' | '30m' | '10m'
+
+  // DLS colour thresholds per unit
+  const DLS_THRESH = { '100ft': [3, 6], '30m': [3, 6], '10m': [1, 2] };
+
+  function getDLSMultiplier() {
+    return dlsUnit === '30m' ? 30 : dlsUnit === '10m' ? 10 : 100;
+  }
+  function getDLSLabel()   { return dlsUnit === '30m' ? 'deg/30m' : dlsUnit === '10m' ? 'deg/10m' : 'deg/100ft'; }
+  function getDepthLabel() { return depthUnit === 'm' ? 'm' : 'ft'; }
+
+  // Update every unit label in the page without recalculating
+  function updateUnitLabels() {
+    const du = getDepthLabel();
+    const dl = getDLSLabel();
+    const [lo, hi] = DLS_THRESH[dlsUnit];
+
+    // Input panel depth spans
+    document.querySelectorAll('.depth-unit').forEach(s => s.textContent = du);
+    // Callout card units
+    document.querySelectorAll('.footage-unit').forEach(s => s.textContent = du);
+    // Table headers
+    el('th-depth').innerHTML   = `Depth<br>(${du})`;
+    el('th-br').innerHTML      = `Build Rate<br>(${dl})`;
+    el('th-tr').innerHTML      = `Turn Rate<br>(${dl})`;
+    el('th-dls').innerHTML     = `DLS<br>(${dl})`;
+    el('th-footage').innerHTML = `Footage<br>(${du})`;
+    // DLS legend
+    el('legend-low').textContent  = ` < ${lo} ${dl} — Low`;
+    el('legend-mid').textContent  = `${lo} – ${hi} ${dl} — Moderate`;
+    el('legend-high').textContent = ` > ${hi} ${dl} — High`;
+    // Show/hide metric DLS sub-selector
+    el('dlsUnitRow').style.display = depthUnit === 'm' ? 'flex' : 'none';
+  }
+
+  // ─── Utility ──────────────────────────────────────────────────
+  const toRad = d => d * Math.PI / 180;
+  const toDeg = r => r * 180 / Math.PI;
+  const fmt   = (v, d=2) => (isFinite(v) ? v.toFixed(d) : '—');
+
+  // ─── Core: Minimum Curvature dogleg angle ─────────────────────
+  // Returns dogleg angle in DEGREES
+  function calcDogleg(inc1, azi1, inc2, azi2) {
+    const i1 = toRad(inc1), i2 = toRad(inc2);
+    const dA = toRad(azi2 - azi1);
+    const cosAngle = Math.cos(i2 - i1) - Math.sin(i1) * Math.sin(i2) * (1 - Math.cos(dA));
+    const clamped  = Math.max(-1, Math.min(1, cosAngle));
+    return toDeg(Math.acos(clamped));   // degrees
+  }
+
+  // ─── Core: Leg calculation ────────────────────────────────────
+  function calcLeg(d1, i1, a1, d2, i2, a2) {
+    const footage = d2 - d1;
+    if (!isFinite(footage) || footage <= 0) {
+      return { footage: footage, buildRate: NaN, turnRate: NaN, dls: NaN, warn: footage < 0 };
+    }
+    const doglegDeg = calcDogleg(i1, a1, i2, a2);
+    const mult      = getDLSMultiplier();
+    return {
+      footage,
+      buildRate: (i2 - i1) / footage * mult,
+      turnRate:  (a2 - a1) / footage * mult,
+      dls:       doglegDeg  / footage * mult,
+      warn:      false
+    };
+  }
+
+  // ─── DLS class helper ─────────────────────────────────────────
+  function getDLSClass(dls) {
+    if (!isFinite(dls)) return '';
+    const [lo, hi] = DLS_THRESH[dlsUnit];
+    if (dls < lo) return 'dls-green';
+    if (dls < hi) return 'dls-yellow';
+    return 'dls-red';
+  }
+
+  // ─── DOM helpers ──────────────────────────────────────────────
+  const el = id => document.getElementById(id);
+
+  function setCell(id, value, decimals=2) {
+    const cell = el(id);
+    if (!cell) return;
+    cell.textContent = fmt(value, decimals);
+  }
+
+  function setDLSCell(id, dls, footage) {
+    const cell = el(id);
+    if (!cell) return;
+    if (!isFinite(dls)) {
+      cell.innerHTML = '<span class="dls-dash">—</span>';
+      return;
+    }
+    const cls = getDLSClass(dls);
+    cell.innerHTML = `<span class="dls-badge ${cls}">${fmt(dls)}</span>`;
+  }
+
+  function setFootageCell(id, footage, warn) {
+    const cell = el(id);
+    if (!cell) return;
+    if (!isFinite(footage)) { cell.textContent = '—'; return; }
+    cell.innerHTML = fmt(footage) + (warn ? '<span class="warn">⚠</span>' : '');
+  }
+
+  // ─── Main calculate ───────────────────────────────────────────
+  function calculate() {
+    // Read inputs
+    const actualDepth = parseFloat(el('actualDepth').value);
+    const actualInc   = parseFloat(el('actualInc').value);
+    const actualAzi   = parseFloat(el('actualAzi').value);
+    const diOffset    = parseFloat(el('diOffset').value);
+    const bitDepth    = parseFloat(el('bitDepth').value);
+    const projInc     = parseFloat(el('projInc').value);
+    const projAzi     = parseFloat(el('projAzi').value);
+    const tdDepth     = tdDepthCurrent;          // read shared state, not DOM
+    const tdInc       = parseFloat(el('tdInc').value);
+    const tdAzi       = parseFloat(el('tdAzi').value);
+
+    // Derived
+    const projDepth          = tdDepth - diOffset;
+    const footageBitToProj   = projDepth - bitDepth;
+    const footageBitToTD     = tdDepth  - bitDepth;
+
+    // Update projected depth readonly field
+    el('projDepth').value = isFinite(projDepth) ? projDepth.toFixed(2) : '';
+
+    // Helper to update a footage callout element
+    function setFootageStat(id, val) {
+      const e = el(id);
+      if (isFinite(val)) {
+        e.textContent = fmt(val);
+        e.style.color = val < 0 ? 'var(--dls-red)' : 'var(--accent)';
+      } else {
+        e.textContent = '—';
+        e.style.color = 'var(--accent)';
+      }
+    }
+    setFootageStat('footageBitToProj', footageBitToProj);
+    setFootageStat('footageBitToTD',   footageBitToTD);
+
+    // Calculate legs
+    const leg1 = calcLeg(actualDepth, actualInc, actualAzi, projDepth, projInc, projAzi);
+    const leg2 = calcLeg(projDepth,   projInc,   projAzi,   tdDepth,   tdInc,   tdAzi);
+
+    // ── Row 0: Actual Survey ──
+    el('r0-depth').textContent = fmt(actualDepth);
+    el('r0-inc').textContent   = fmt(actualInc);
+    el('r0-azi').textContent   = fmt(actualAzi);
+
+    // ── Row 1: Projected Last Survey ──
+    el('r1-depth').textContent = isFinite(projDepth) ? fmt(projDepth) : '—';
+    el('r1-inc').textContent   = fmt(projInc);
+    el('r1-azi').textContent   = fmt(projAzi);
+    setCell('r1-br', leg1.buildRate);
+    setCell('r1-tr', leg1.turnRate);
+    setDLSCell('r1-dls', leg1.dls);
+    setFootageCell('r1-ft', leg1.footage, leg1.warn);
+
+    // ── Row 2: Projection to TD ──
+    el('r2-depth').textContent = fmt(tdDepth);
+    el('r2-inc').textContent   = fmt(tdInc);
+    el('r2-azi').textContent   = fmt(tdAzi);
+    setCell('r2-br', leg2.buildRate);
+    setCell('r2-tr', leg2.turnRate);
+    setDLSCell('r2-dls', leg2.dls);
+    setFootageCell('r2-ft', leg2.footage, leg2.warn);
+  }
+
+  // ─── Shared TD depth state ────────────────────────────────────
+  // Single source of truth — calculate() always reads this variable,
+  // never the DOM, so slider/number sync timing is irrelevant.
+  let tdDepthCurrent = parseFloat(el('tdDepth').value);
+
+  // ─── Recenter slider around a new center value ────────────────
+  function recenterSlider(centerVal) {
+    const s   = el('tdSlider');
+    const min = centerVal - 100;
+    const max = centerVal + 100;
+    s.min   = min;
+    s.max   = max;
+    s.value = centerVal;
+    el('sliderMin').textContent   = min.toFixed(0);
+    el('sliderMax').textContent   = max.toFixed(0);
+    el('tdSliderVal').textContent = centerVal.toFixed(0);
+  }
+
+  // ─── setTDDepth: the ONE place that changes TD depth ─────────
+  function setTDDepth(v, source) {
+    if (!isFinite(v)) return;
+    tdDepthCurrent = v;
+    if (source !== 'number') el('tdDepth').value = v;
+    if (source === 'number') recenterSlider(v);   // retype → recenter
+    el('tdSliderVal').textContent = Math.round(v);
+    calculate();
+  }
+
+  // ─── Slider drag ──────────────────────────────────────────────
+  el('tdSlider').addEventListener('input',  function () { setTDDepth(parseFloat(this.value), 'slider'); });
+  el('tdSlider').addEventListener('change', function () { setTDDepth(parseFloat(this.value), 'slider'); });
+
+  // ─── Number field typed ───────────────────────────────────────
+  el('tdDepth').addEventListener('input',  function () { setTDDepth(parseFloat(this.value), 'number'); });
+  el('tdDepth').addEventListener('change', function () { setTDDepth(parseFloat(this.value), 'number'); });
+
+  // ─── Wire all other inputs ────────────────────────────────────
+  ['actualDepth','actualInc','actualAzi',
+   'diOffset','bitDepth','projInc','projAzi',
+   'tdInc','tdAzi'].forEach(id => {
+    el(id).addEventListener('input', calculate);
+  });
+
+  // ─── Unit button clicks ───────────────────────────────────────
+  document.querySelectorAll('.unit-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const group = this.dataset.group;
+      const value = this.dataset.value;
+      // Mark active within this group
+      document.querySelectorAll(`[data-group="${group}"]`).forEach(b =>
+        b.classList.toggle('active', b === this)
+      );
+      if (group === 'depth') {
+        depthUnit = value;
+        if (value === 'ft') {
+          // Back to imperial → always deg/100ft
+          dlsUnit = '100ft';
+        } else {
+          // Metric → default to deg/30m, activate that button
+          dlsUnit = '30m';
+          document.querySelectorAll('[data-group="dls"]').forEach(b =>
+            b.classList.toggle('active', b.dataset.value === '30m')
+          );
+        }
+      } else {
+        dlsUnit = value;
+      }
+      updateUnitLabels();
+      calculate();
+    });
+  });
+
+  // ─── Initial render ───────────────────────────────────────────
+  recenterSlider(tdDepthCurrent);
+  updateUnitLabels();
+  calculate();
+</script>
+</body>
+</html>
