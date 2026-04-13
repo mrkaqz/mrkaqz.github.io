@@ -343,12 +343,16 @@
     .warn { color: var(--dls-red); font-size: 10px; margin-left: 4px; }
 
     /* ─── Unit toggle buttons ───────────────────────────────────── */
+    /* Units fieldset gets its own simple 2-col layout */
+    #unitFieldset .field-row {
+      grid-template-columns: 1fr auto;
+    }
+
     .unit-group {
       display: inline-flex;
       border: 1px solid var(--border);
       border-radius: 4px;
       overflow: hidden;
-      grid-column: 2 / 4;      /* span input + unit columns */
     }
     .unit-btn {
       background: transparent;
@@ -419,7 +423,7 @@
     <p class="panel-title">Survey &amp; TD Inputs</p>
 
     <!-- Units -->
-    <fieldset>
+    <fieldset id="unitFieldset">
       <legend>Units</legend>
       <div class="field-row">
         <label>Depth</label>
