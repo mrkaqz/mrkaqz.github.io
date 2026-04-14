@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAS Drilling Data Analyzer</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222535;
+    --border: #2e3247;
+    --accent: #4f8ef7;
+    --accent2: #f7934f;
+    --accent3: #4fc97f;
+    --accent4: #f74f7a;
+    --text: #e2e6f0;
+    --text-muted: #7b82a0;
+    --text-dim: #4a5070;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+
+  /* Header */
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; gap: 16px; }
+  .header h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.3px; }
+  .header .subtitle { color: var(--text-muted); font-size: 12px; }
+
+  /* Upload zone */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin: 24px;
+    background: var(--surface);
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(79,142,247,0.05);
+  }
+  .upload-zone .icon { font-size: 40px; margin-bottom: 12px; }
+  .upload-zone h2 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .upload-zone p { color: var(--text-muted); font-size: 13px; }
+  .upload-btn {
+    display: inline-block; margin-top: 16px; padding: 10px 24px;
+    background: var(--accent); color: #fff; border-radius: 8px;
+    font-size: 14px; font-weight: 500; cursor: pointer; border: none;
+    transition: opacity 0.2s;
+  }
+  .upload-btn:hover { opacity: 0.85; }
+  #fileInput { display: none; }
+
+  /* Main content */
+  .main { padding: 0 24px 40px; display: none; }
+
+  /* Well info bar */
+  .well-bar {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 20px; margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 24px; align-items: center;
+  }
+  .well-bar .field { display: flex; flex-direction: column; gap: 2px; }
+  .well-bar .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .well-bar .value { font-size: 14px; font-weight: 500; }
+
+  /* Section title */
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin: 24px 0 12px; }
+
+  /* Result cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 8px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .card.blue::before { background: var(--accent); }
+  .card.orange::before { background: var(--accent2); }
+  .card.green::before { background: var(--accent3); }
+  .card.red::before { background: var(--accent4); }
+  .card-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .card-value { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+  .card-unit { font-size: 14px; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+  .card-stats { display: flex; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .card-stat { display: flex; flex-direction: column; gap: 2px; }
+  .card-stat .s-label { font-size: 11px; color: var(--text-dim); }
+  .card-stat .s-val { font-size: 13px; font-weight: 500; }
+
+  /* Charts */
+  .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin-top: 8px; }
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+  }
+  .chart-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .chart-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
+  .chart-wrap { height: 420px; position: relative; }
+
+  /* Notice */
+  .notice {
+    background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.2);
+    border-radius: 8px; padding: 10px 16px; font-size: 12px; color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  /* Loading */
+  .loading { text-align: center; padding: 60px 24px; color: var(--text-muted); display: none; }
+  .spinner {
+    width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Error */
+  .error-msg {
+    background: rgba(247,79,122,0.1); border: 1px solid rgba(247,79,122,0.3);
+    border-radius: 8px; padding: 14px 18px; margin: 16px 24px; display: none; color: var(--accent4);
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500;
+    background: rgba(79,142,247,0.15); color: var(--accent); margin-left: 8px;
+  }
+
+  /* Table */
+  .data-table-wrap { overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th {
+    background: var(--surface2); padding: 8px 12px; text-align: left;
+    color: var(--text-muted); font-weight: 500; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+  }
+  .data-table td { padding: 6px 12px; border-bottom: 1px solid rgba(46,50,71,0.5); }
+  .data-table tr:hover td { background: var(--surface2); }
+  .data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .table-scroll { max-height: 280px; overflow-y: auto; }
+
+  /* Depth range bar */
+  .depth-bar {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 20px; margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;
+  }
+  .depth-bar .field { display: flex; flex-direction: column; gap: 4px; }
+  .depth-bar label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .depth-input {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 14px; padding: 7px 12px; width: 130px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .depth-input:focus { border-color: var(--accent); }
+  .apply-btn {
+    padding: 8px 22px; background: var(--accent); color: #fff; border: none;
+    border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: opacity 0.2s; white-space: nowrap;
+  }
+  .apply-btn:hover { opacity: 0.85; }
+  .depth-hint { font-size: 11px; color: var(--text-dim); align-self: center; }
+
+  /* Outlier filter bar */
+  .filter-bar {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 20px; margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;
+  }
+  .filter-bar .field { display: flex; flex-direction: column; gap: 4px; }
+  .filter-bar label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .mode-group { display: flex; gap: 4px; }
+  .mode-btn {
+    padding: 7px 14px; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 12px; font-weight: 500; border-radius: 6px;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .mode-btn:hover { border-color: var(--accent); color: var(--text); }
+  .mode-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filter-input {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 14px; padding: 7px 12px; width: 110px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .filter-input:focus { border-color: var(--accent); }
+  .param-field { display: flex; flex-direction: column; gap: 4px; transition: opacity 0.2s; }
+  .param-field.hidden { opacity: 0.3; pointer-events: none; }
+  .filter-desc { font-size: 11px; color: var(--text-dim); align-self: center; max-width: 260px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>LAS Drilling Data Analyzer</h1>
+    <div class="subtitle">RSS / MWD Performance Analysis — Shock · Stick Slip · DLS at 100% PropEff</div>
+  </div>
+</div>
+
+<!-- Upload -->
+<div class="upload-zone" id="uploadZone">
+  <div class="icon">📂</div>
+  <h2>Drop your LAS file here</h2>
+  <p>Supports standard LAS 2.0 format · Null values (-999.25) are automatically excluded</p>
+  <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Browse File</button>
+  <input type="file" id="fileInput" accept=".las,.LAS">
+</div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div>Parsing LAS file…</div>
+</div>
+
+<div class="error-msg" id="errorMsg"></div>
+
+<!-- Main dashboard -->
+<div class="main" id="mainContent">
+
+  <!-- Well info -->
+  <div class="section-title">Well Information</div>
+  <div class="well-bar" id="wellBar"></div>
+
+  <!-- Depth range filter -->
+  <div class="section-title">Depth Range Filter</div>
+  <div class="depth-bar">
+    <div class="field">
+      <label>Start Depth (ft)</label>
+      <input class="depth-input" type="number" id="depthFrom" placeholder="e.g. 1000" step="0.5">
+    </div>
+    <div class="field">
+      <label>End Depth (ft)</label>
+      <input class="depth-input" type="number" id="depthTo" placeholder="e.g. 3500" step="0.5">
+    </div>
+    <button class="apply-btn" onclick="applyDepthFilter()">Apply</button>
+    <div class="depth-hint" id="depthHint"></div>
+  </div>
+
+  <!-- Outlier filter -->
+  <div class="section-title">DLS Outlier Filter</div>
+  <div class="filter-bar">
+    <div class="field">
+      <label>Filter Mode</label>
+      <div class="mode-group">
+        <button class="mode-btn active" data-mode="hardcap"  onclick="setMode(this)">Hard Cap</button>
+        <button class="mode-btn"        data-mode="iqr"      onclick="setMode(this)">IQR</button>
+        <button class="mode-btn"        data-mode="mad"      onclick="setMode(this)">MAD</button>
+        <button class="mode-btn"        data-mode="pct"      onclick="setMode(this)">Percentile</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Hard Cap (deg/100ft)</label>
+      <input class="filter-input" type="number" id="hardCapVal" value="20" min="0" step="0.5">
+    </div>
+    <div class="param-field hidden" id="paramIqr">
+      <label>IQR Multiplier</label>
+      <input class="filter-input" type="number" id="iqrMult" value="1.5" min="0.1" step="0.1">
+    </div>
+    <div class="param-field hidden" id="paramMad">
+      <label>MAD Threshold</label>
+      <input class="filter-input" type="number" id="madThresh" value="3.5" min="0.1" step="0.1">
+    </div>
+    <div class="param-field hidden" id="paramPct">
+      <label>Percentile (%)</label>
+      <input class="filter-input" type="number" id="pctVal" value="95" min="50" max="99" step="1">
+    </div>
+    <button class="apply-btn" onclick="applyFilters()">Apply</button>
+    <div class="filter-desc" id="filterDesc">Values above the hard cap are excluded as physically invalid.</div>
+  </div>
+
+  <div class="notice" id="filterNotice"></div>
+
+  <!-- Results -->
+  <div class="section-title">Analysis Results</div>
+  <div class="cards">
+    <div class="card blue">
+      <div class="card-title">DLS_CONT @ 100% PropEff <span style="font-size:10px;color:var(--text-dim)">(primary)</span></div>
+      <div><span class="card-value" id="dlsAvg">—</span><span class="card-unit">deg/100ft</span></div>
+      <div class="card-stats">
+        <div class="card-stat"><div class="s-label">Min</div><div class="s-val" id="dlsMin">—</div></div>
+        <div class="card-stat"><div class="s-label">Max</div><div class="s-val" id="dlsMax">—</div></div>
+        <div class="card-stat"><div class="s-label">Samples</div><div class="s-val" id="dlsCount">—</div></div>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;color:var(--text-dim)">DLS_RSS_CONT avg</span>
+          <span style="font-size:13px;font-weight:500;" id="dlsRssAvg">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;color:var(--text-dim)">DLS_MWD_CONT avg</span>
+          <span style="font-size:13px;font-weight:500;" id="dlsMwdAvg">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="card orange">
+      <div class="card-title">Shock Rate — Run Average</div>
+      <div><span class="card-value" id="shkAvg">—</span><span class="card-unit">1/s</span></div>
+      <div class="card-stats">
+        <div class="card-stat"><div class="s-label">Max</div><div class="s-val" id="shkMax">—</div></div>
+        <div class="card-stat"><div class="s-label">Samples</div><div class="s-val" id="shkCount">—</div></div>
+      </div>
+    </div>
+    <div class="card green">
+      <div class="card-title">Stick Slip — Run Average</div>
+      <div><span class="card-value" id="stickAvg">—</span><span class="card-unit">c/min</span></div>
+      <div class="card-stats">
+        <div class="card-stat"><div class="s-label">Max</div><div class="s-val" id="stickMax">—</div></div>
+        <div class="card-stat"><div class="s-label">Samples</div><div class="s-val" id="stickCount">—</div></div>
+      </div>
+    </div>
+    <div class="card red">
+      <div class="card-title">PropEff Valid Range</div>
+      <div><span class="card-value" id="propAvg">—</span><span class="card-unit">%</span></div>
+      <div class="card-stats">
+        <div class="card-stat"><div class="s-label">Min</div><div class="s-val" id="propMin">—</div></div>
+        <div class="card-stat"><div class="s-label">Max (capped 100%)</div><div class="s-val" id="propMax">—</div></div>
+        <div class="card-stat"><div class="s-label">Samples</div><div class="s-val" id="propCount">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="section-title" style="margin-top:28px">Depth Tracks</div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">PropEff &amp; DLS_CONT <span class="badge">vs Depth</span></div>
+      <div class="chart-sub">Blue = PropEff (%) · Orange = DLS_CONT scaled to 100% PropEff (deg/100ft)</div>
+      <div class="chart-wrap"><canvas id="chartPropDls"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Shock Rate &amp; Stick Slip <span class="badge">vs Depth</span></div>
+      <div class="chart-sub">Orange = Shock Rate (1/s) · Green = Stick Slip (c/min)</div>
+      <div class="chart-wrap"><canvas id="chartShockStick"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Scaled DLS table -->
+  <div class="section-title" style="margin-top:28px">DLS @ 100% PropEff — Sample Data</div>
+  <div class="chart-card" style="margin-bottom:20px;">
+    <div class="table-scroll">
+      <div class="data-table-wrap">
+        <table class="data-table" id="dlsTable">
+          <thead>
+            <tr>
+              <th>Depth (ft)</th>
+              <th class="num">PropEff (%)</th>
+              <th class="num">DLS_CONT (deg/100ft)</th>
+              <th class="num">DLS @ 100% (deg/100ft)</th>
+            </tr>
+          </thead>
+          <tbody id="dlsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// LAS PARSER
+// ─────────────────────────────────────────────
+function parseLAS(text) {
+  const NULL_DEFAULT = -999.25;
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+
+  let nullVal = NULL_DEFAULT;
+  const wellInfo = {};
+  const curveOrder = []; // [{mnemonic, unit, desc}]
+  let mode = '';
+  let dataLines = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const trimmed = raw.trim();
+
+    // Section headers
+    if (trimmed.startsWith('~W')) { mode = 'WELL'; continue; }
+    if (trimmed.startsWith('~C')) { mode = 'CURVE'; continue; }
+    if (trimmed.startsWith('~A')) { mode = 'DATA'; continue; }
+    if (trimmed.startsWith('~')) { mode = 'OTHER'; continue; }
+    if (trimmed.startsWith('#') || trimmed === '') continue;
+
+    if (mode === 'WELL') {
+      const m = trimmed.match(/^([^.]+)\.([^\s]*)\s+(.*?)\s*:\s*(.*)$/);
+      if (m) {
+        const mnem = m[1].trim().toUpperCase();
+        const val = m[3].trim();
+        wellInfo[mnem] = val;
+        if (mnem === 'NULL') nullVal = parseFloat(val);
+      }
+    }
+
+    if (mode === 'CURVE') {
+      const m = trimmed.match(/^([^.]+)\.([^\s]*)\s*(.*?)\s*:\s*(.*)$/);
+      if (m) {
+        const mnem = m[1].trim().toUpperCase();
+        const unit = m[2].trim();
+        const desc = m[4].trim();
+        curveOrder.push({ mnem, unit, desc });
+      }
+    }
+
+    if (mode === 'DATA') {
+      dataLines.push(trimmed);
+    }
+  }
+
+  // Build column index map (handle duplicates by appending _2, _3 etc.)
+  const colIndex = {};
+  const colCount = {};
+  curveOrder.forEach((c, i) => {
+    const key = c.mnem;
+    if (colCount[key] === undefined) {
+      colCount[key] = 1;
+      colIndex[key] = i;
+    } else {
+      colCount[key]++;
+      colIndex[key + '_' + colCount[key]] = i;
+    }
+  });
+
+  // Parse data rows
+  const rows = [];
+  for (const line of dataLines) {
+    if (!line) continue;
+    const parts = line.trim().split(/\s+/);
+    if (parts.length < 2) continue;
+    const nums = parts.map(Number);
+    rows.push(nums);
+  }
+
+  return { nullVal, wellInfo, curveOrder, colIndex, rows };
+}
+
+// ─────────────────────────────────────────────
+// GET COLUMN VALUES
+// ─────────────────────────────────────────────
+function getCol(rows, colIndex, mnem, nullVal) {
+  const idx = colIndex[mnem];
+  if (idx === undefined) return null;
+  return rows.map(r => {
+    const v = r[idx];
+    return (v === undefined || Math.abs(v - nullVal) < 0.001) ? null : v;
+  });
+}
+
+// ─────────────────────────────────────────────
+// OUTLIER FILTER HELPERS
+// ─────────────────────────────────────────────
+function medianVal(sorted) {
+  const m = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[m] : (sorted[m - 1] + sorted[m]) / 2;
+}
+function percentileValue(sorted, p) {
+  const idx = (p / 100) * (sorted.length - 1);
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+}
+
+function computeThreshold(rawArr, cfg) {
+  // Step 1: always apply hard cap as physical sanity filter first
+  const valid = rawArr.filter(v => v !== null && v >= 0 && v <= cfg.hardCap);
+  if (!valid.length) return cfg.hardCap;
+  const sorted = [...valid].sort((a, b) => a - b);
+
+  if (cfg.mode === 'hardcap') return cfg.hardCap;
+
+  if (cfg.mode === 'iqr') {
+    const q1 = percentileValue(sorted, 25);
+    const q3 = percentileValue(sorted, 75);
+    return q3 + cfg.iqrMult * (q3 - q1);
+  }
+
+  if (cfg.mode === 'mad') {
+    const med = medianVal(sorted);
+    const madSorted = valid.map(v => Math.abs(v - med)).sort((a, b) => a - b);
+    const mad = medianVal(madSorted);
+    if (mad === 0) return cfg.hardCap;
+    // inverse of modified z-score: threshold = median + (madThresh / 0.6745) * MAD
+    return med + (cfg.madThresh / 0.6745) * mad;
+  }
+
+  if (cfg.mode === 'pct') {
+    return percentileValue(sorted, cfg.pct);
+  }
+
+  return cfg.hardCap;
+}
+
+// ─────────────────────────────────────────────
+// CALCULATIONS
+// ─────────────────────────────────────────────
+function calcDLSat100(propEffArr, dlsArr, cfg) {
+  if (!propEffArr || !dlsArr) return [];
+  const threshold = computeThreshold(dlsArr, cfg);
+  const result = [];
+  for (let i = 0; i < propEffArr.length; i++) {
+    const pe  = propEffArr[i];
+    const dls = dlsArr[i];
+    if (pe === null || dls === null) continue;
+    if (pe <= 0 || pe > 100) continue;
+    if (dls > threshold) continue;
+    const dls100 = dls * (100 / pe);
+    if (dls100 > threshold) continue;
+    result.push({ idx: i, pe, dls, dls100, threshold });
+  }
+  return result;
+}
+
+// ─────────────────────────────────────────────
+// FILTER MODE UI
+// ─────────────────────────────────────────────
+const modeDescriptions = {
+  hardcap: 'Values above the hard cap are excluded as physically invalid.',
+  iqr:     'IQR: removes values above Q3 + (multiplier × IQR). Hard cap applied first. Lower multiplier = stricter.',
+  mad:     'MAD: removes values deviating more than threshold × MAD from the median. Hard cap applied first.',
+  pct:     'Percentile: removes values above the Nth percentile of valid data. Hard cap applied first.',
+};
+
+function setMode(btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const mode = btn.dataset.mode;
+  document.getElementById('paramIqr').classList.toggle('hidden', mode !== 'iqr');
+  document.getElementById('paramMad').classList.toggle('hidden', mode !== 'mad');
+  document.getElementById('paramPct').classList.toggle('hidden', mode !== 'pct');
+  document.getElementById('filterDesc').textContent = modeDescriptions[mode];
+}
+
+function getFilterConfig() {
+  const mode    = document.querySelector('.mode-btn.active')?.dataset.mode || 'hardcap';
+  const hardCap = parseFloat(document.getElementById('hardCapVal').value) || 20;
+  const iqrMult = parseFloat(document.getElementById('iqrMult').value)    || 1.5;
+  const madThresh = parseFloat(document.getElementById('madThresh').value) || 3.5;
+  const pct     = parseFloat(document.getElementById('pctVal').value)     || 95;
+  return { mode, hardCap, iqrMult, madThresh, pct };
+}
+
+function stats(arr) {
+  if (!arr.length) return { avg: null, min: null, max: null, count: 0 };
+  const sum = arr.reduce((a, b) => a + b, 0);
+  return {
+    avg: sum / arr.length,
+    min: Math.min(...arr),
+    max: Math.max(...arr),
+    count: arr.length
+  };
+}
+
+function fmt(v, dec = 2) {
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  return v.toFixed(dec);
+}
+
+function fmtBig(n) {
+  if (n === null) return '—';
+  return n.toLocaleString();
+}
+
+// ─────────────────────────────────────────────
+// CHARTS
+// ─────────────────────────────────────────────
+let chart1 = null, chart2 = null;
+
+function downsample(arr, maxPoints = 600) {
+  if (arr.length <= maxPoints) return arr;
+  const step = Math.ceil(arr.length / maxPoints);
+  return arr.filter((_, i) => i % step === 0);
+}
+
+function makeDepthChart(canvasId, depth, datasets, existingChart) {
+  if (existingChart) existingChart.destroy();
+  const ctx = document.getElementById(canvasId).getContext('2d');
+
+  // Build point arrays: {x: value, y: depth}
+  const ds = datasets.map(d => ({
+    label: d.label,
+    data: depth.map((dep, i) => ({ x: d.values[i], y: dep })).filter(p => p.x !== null),
+    borderColor: d.color,
+    backgroundColor: d.color + '22',
+    borderWidth: 1.5,
+    pointRadius: 0,
+    tension: 0,
+    fill: false,
+    yAxisID: 'yDepth',
+    xAxisID: d.xAxis || 'x1',
+    parsing: false,
+  }));
+
+  return new Chart(ctx, {
+    type: 'line',
+    data: { datasets: ds },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        yDepth: {
+          type: 'linear',
+          position: 'left',
+          reverse: true,
+          title: { display: true, text: 'Depth (ft)', color: '#7b82a0', font: { size: 11 } },
+          ticks: { color: '#7b82a0', font: { size: 10 } },
+          grid: { color: '#2e3247' },
+        },
+        x1: {
+          type: 'linear',
+          position: 'bottom',
+          title: { display: true, text: datasets[0].label, color: datasets[0].color, font: { size: 10 } },
+          ticks: { color: '#7b82a0', font: { size: 10 } },
+          grid: { color: '#2e3247' },
+        },
+        x2: {
+          type: 'linear',
+          position: 'top',
+          display: datasets.length > 1,
+          title: { display: true, text: datasets[1] ? datasets[1].label : '', color: datasets[1] ? datasets[1].color : '#fff', font: { size: 10 } },
+          ticks: { color: '#7b82a0', font: { size: 10 } },
+          grid: { display: false },
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: '#e2e6f0', font: { size: 11 }, boxWidth: 12 }
+        },
+        tooltip: {
+          backgroundColor: '#1a1d27',
+          borderColor: '#2e3247',
+          borderWidth: 1,
+          titleColor: '#e2e6f0',
+          bodyColor: '#7b82a0',
+        }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────────────────────
+// RENDER DASHBOARD
+// ─────────────────────────────────────────────
+function renderDashboard(las, depthFrom, depthTo, cfg) {
+  cfg = cfg || getFilterConfig();
+  const { nullVal, wellInfo, colIndex, rows } = las;
+
+  // Pull full arrays first
+  const depthFull   = getCol(rows, colIndex, 'DEPT', nullVal);
+  const propEffFull = getCol(rows, colIndex, 'PROPEFF', nullVal);
+  const dlsContFull = getCol(rows, colIndex, 'DLS_CONT', nullVal);
+  const dlsRssFull  = getCol(rows, colIndex, 'DLS_RSS_CONT', nullVal);
+  const dlsMwdFull  = getCol(rows, colIndex, 'DLS_MWD_CONT', nullVal);
+  const shkrFull    = getCol(rows, colIndex, 'SHKR', nullVal);
+  const shkr2Full   = getCol(rows, colIndex, 'SHKR_2', nullVal);
+  const stickFull   = getCol(rows, colIndex, 'STICK', nullVal);
+
+  // Determine effective depth range
+  const allDepths = (depthFull || []).filter(v => v !== null);
+  const fileMin = allDepths.length ? Math.min(...allDepths) : 0;
+  const fileMax = allDepths.length ? Math.max(...allDepths) : 99999;
+  const dFrom = (depthFrom !== undefined && depthFrom !== null && depthFrom !== '') ? Number(depthFrom) : fileMin;
+  const dTo   = (depthTo   !== undefined && depthTo   !== null && depthTo   !== '') ? Number(depthTo)   : fileMax;
+
+  // Build mask: indices within depth range
+  const mask = (depthFull || rows.map((_, i) => i)).map((d, i) => d !== null && d >= dFrom && d <= dTo);
+
+  // Apply mask to all arrays
+  function applyMask(arr) {
+    if (!arr) return null;
+    return arr.filter((_, i) => mask[i]);
+  }
+  const depth   = applyMask(depthFull);
+  const propEff = applyMask(propEffFull);
+  const dlsCont = applyMask(dlsContFull);
+  const dlsRss  = applyMask(dlsRssFull);
+  const dlsMwd  = applyMask(dlsMwdFull);
+  const shkr    = applyMask(shkrFull);
+  const shkr2   = applyMask(shkr2Full);
+  const stick   = applyMask(stickFull);
+
+  // Use first SHKR that has data; fall back to second
+  const shockArr = shkr || shkr2;
+
+  // ── Well info bar
+  const wellBar = document.getElementById('wellBar');
+  const fields = [
+    ['Well', wellInfo['WELL'] || '—'],
+    ['Company', wellInfo['COMP'] || '—'],
+    ['Rig', wellInfo['RIGN'] || '—'],
+    ['Date', wellInfo['DATE'] || '—'],
+    ['File Depth Range', `${fmt(fileMin,1)} – ${fmt(fileMax,1)} ft`],
+    ['Active Range', `${fmt(dFrom,1)} – ${fmt(dTo,1)} ft`],
+    ['Active Rows', fmtBig(mask.filter(Boolean).length) + ' / ' + fmtBig(rows.length)],
+    ['Null Value', wellInfo['NULL'] || nullVal],
+  ];
+  wellBar.innerHTML = fields.map(([l, v]) =>
+    `<div class="field"><div class="label">${l}</div><div class="value">${v}</div></div>`
+  ).join('');
+
+  // ── Keep inputs in sync with current range
+  document.getElementById('depthFrom').value = dFrom;
+  document.getElementById('depthTo').value   = dTo;
+  document.getElementById('depthHint').textContent =
+    `File range: ${fmt(fileMin,1)} – ${fmt(fileMax,1)} ft`;
+
+  // ── DLS @ 100% PropEff — primary: DLS_CONT
+  const dlsRows    = calcDLSat100(propEff, dlsCont, cfg);
+  const dls100Vals = dlsRows.map(r => r.dls100);
+  const dlsStat    = stats(dls100Vals);
+  const computedThreshold = dlsRows.length ? dlsRows[0].threshold : cfg.hardCap;
+
+  document.getElementById('dlsAvg').textContent   = fmt(dlsStat.avg);
+  document.getElementById('dlsMin').textContent   = fmt(dlsStat.min) + ' deg/100ft';
+  document.getElementById('dlsMax').textContent   = fmt(dlsStat.max) + ' deg/100ft';
+  document.getElementById('dlsCount').textContent = fmtBig(dlsStat.count);
+
+  // ── Secondary DLS channels
+  const dlsRssRows = calcDLSat100(propEff, dlsRss, cfg);
+  const dlsRssStat = stats(dlsRssRows.map(r => r.dls100));
+  const dlsMwdRows = calcDLSat100(propEff, dlsMwd, cfg);
+  const dlsMwdStat = stats(dlsMwdRows.map(r => r.dls100));
+  document.getElementById('dlsRssAvg').textContent =
+    dlsRssStat.avg !== null ? fmt(dlsRssStat.avg) + ' deg/100ft' : 'N/A';
+  document.getElementById('dlsMwdAvg').textContent =
+    dlsMwdStat.avg !== null ? fmt(dlsMwdStat.avg) + ' deg/100ft' : 'N/A';
+
+  // ── Shock
+  const validShock = (shockArr || []).filter(v => v !== null);
+  const shkStat = stats(validShock);
+  document.getElementById('shkAvg').textContent = fmt(shkStat.avg, 3);
+  document.getElementById('shkMax').textContent = fmt(shkStat.max, 3) + ' 1/s';
+  document.getElementById('shkCount').textContent = fmtBig(shkStat.count);
+
+  // ── Stick Slip
+  const validStick = (stick || []).filter(v => v !== null);
+  const stickStat = stats(validStick);
+  document.getElementById('stickAvg').textContent = fmt(stickStat.avg, 1);
+  document.getElementById('stickMax').textContent = fmt(stickStat.max, 1) + ' c/min';
+  document.getElementById('stickCount').textContent = fmtBig(stickStat.count);
+
+  // ── PropEff stats (valid: 0 < v <= 100)
+  const validProp = (propEff || []).filter(v => v !== null && v > 0 && v <= 100);
+  const propStat = stats(validProp);
+  const propOver100 = (propEff || []).filter(v => v !== null && v > 100).length;
+  document.getElementById('propAvg').textContent = fmt(propStat.avg, 1);
+  document.getElementById('propMin').textContent = fmt(propStat.min, 1) + ' %';
+  document.getElementById('propMax').textContent = fmt(propStat.max, 1) + ' %';
+  document.getElementById('propCount').textContent = fmtBig(propStat.count);
+
+  // ── Notice
+  const modeLabel = { hardcap:'Hard Cap', iqr:'IQR', mad:'MAD', pct:'Percentile' }[cfg.mode];
+  const dlsExcluded = (dlsCont || []).filter(v => v !== null && v > computedThreshold).length;
+  document.getElementById('filterNotice').innerHTML =
+    `<strong>Depth range:</strong> ${fmt(dFrom,1)} – ${fmt(dTo,1)} ft (${fmtBig(mask.filter(Boolean).length)} rows) &nbsp;·&nbsp;
+     <strong>Primary channel:</strong> DLS_CONT &nbsp;·&nbsp;
+     <strong>Outlier filter:</strong> ${modeLabel} — threshold <strong>${fmt(computedThreshold,3)} deg/100ft</strong>
+     (${fmtBig(dlsExcluded)} rows excluded) ·
+     PropEff &gt; 100% excluded (${fmtBig(propOver100)} rows) ·
+     DLS @ 100% = <em>DLS_CONT × (100 ÷ PropEff)</em>`;
+
+  // ── DLS table (max 200 rows, sampled evenly)
+  const step = Math.max(1, Math.floor(dlsRows.length / 200));
+  const tableRows = dlsRows.filter((_, i) => i % step === 0).slice(0, 200);
+  const tbody = document.getElementById('dlsTableBody');
+  tbody.innerHTML = tableRows.map(r => {
+    const dep = depth ? depth[r.idx] : '—';
+    return `<tr>
+      <td>${fmt(dep, 1)}</td>
+      <td class="num">${fmt(r.pe, 2)}</td>
+      <td class="num">${fmt(r.dls, 4)}</td>
+      <td class="num" style="color:#4f8ef7;font-weight:600">${fmt(r.dls100, 4)}</td>
+    </tr>`;
+  }).join('');
+
+  // ── Charts — downsample for performance
+  const N = rows.length;
+  const step2 = Math.max(1, Math.floor(N / 600));
+  const dIdx = Array.from({length: N}, (_, i) => i).filter(i => i % step2 === 0);
+
+  const depSamp = dIdx.map(i => depth ? depth[i] : i * 0.5 + 238.5);
+
+  // Chart 1: PropEff + DLS@100
+  const propSamp = dIdx.map(i => {
+    const v = propEff ? propEff[i] : null;
+    return (v !== null && v > 0 && v <= 100) ? v : null;
+  });
+  const dls100Samp = dIdx.map(i => {
+    const pe  = propEff ? propEff[i] : null;
+    const dls = dlsCont ? dlsCont[i] : null;
+    if (pe === null || dls === null || pe <= 0 || pe > 100 || dls > computedThreshold) return null;
+    const scaled = dls * (100 / pe);
+    return scaled > computedThreshold ? null : scaled;
+  });
+
+  chart1 = makeDepthChart('chartPropDls', depSamp, [
+    { label: 'PropEff (%)', values: propSamp, color: '#4f8ef7', xAxis: 'x1' },
+    { label: 'DLS@100% (deg/100ft)', values: dls100Samp, color: '#f7934f', xAxis: 'x2' },
+  ], chart1);
+
+  // Chart 2: Shock + Stick
+  const shkSamp = dIdx.map(i => shockArr ? shockArr[i] : null);
+  const stickSamp = dIdx.map(i => stick ? stick[i] : null);
+
+  chart2 = makeDepthChart('chartShockStick', depSamp, [
+    { label: 'Shock Rate (1/s)', values: shkSamp, color: '#f7934f', xAxis: 'x1' },
+    { label: 'Stick Slip (c/min)', values: stickSamp, color: '#4fc97f', xAxis: 'x2' },
+  ], chart2);
+
+  // Show dashboard
+  document.getElementById('mainContent').style.display = 'block';
+}
+
+// ─────────────────────────────────────────────
+// DEPTH FILTER
+// ─────────────────────────────────────────────
+let _currentLas = null;
+
+function applyFilters() {
+  if (!_currentLas) return;
+  const from = document.getElementById('depthFrom').value;
+  const to   = document.getElementById('depthTo').value;
+  const cfg  = getFilterConfig();
+  renderDashboard(_currentLas, from, to, cfg);
+}
+
+// Keep old name working (used by depth Apply button)
+function applyDepthFilter() { applyFilters(); }
+
+// Press Enter in any input to apply
+['depthFrom','depthTo','hardCapVal','iqrMult','madThresh','pctVal'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
+});
+
+// ─────────────────────────────────────────────
+// FILE HANDLING
+// ─────────────────────────────────────────────
+function processFile(file) {
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.las')) {
+    showError('Please upload a LAS file (.las)');
+    return;
+  }
+
+  document.getElementById('uploadZone').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'none';
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const las = parseLAS(e.target.result);
+      document.getElementById('loading').style.display = 'none';
+
+      if (!las.rows.length) {
+        showError('No data rows found in LAS file. Check the file format.');
+        document.getElementById('uploadZone').style.display = 'block';
+        return;
+      }
+
+      _currentLas = las;
+      renderDashboard(las);
+    } catch (err) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('uploadZone').style.display = 'block';
+      showError('Error parsing LAS file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// File input
+document.getElementById('fileInput').addEventListener('change', e => {
+  processFile(e.target.files[0]);
+});
+
+// Drag & drop
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('drag-over');
+  processFile(e.dataTransfer.files[0]);
+});
+zone.addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') document.getElementById('fileInput').click();
+});
+</script>
+
+<footer style="text-align:center;padding:20px 24px;font-size:11px;color:#4a5070;border-top:1px solid #2e3247;margin-top:8px;">
+  LAS Drilling Data Analyzer &nbsp;·&nbsp; <strong style="color:#7b82a0">v2.0.0</strong> &nbsp;·&nbsp; RSS / MWD Performance Analysis
+</footer>
+
+</body>
+</html>
