@@ -321,16 +321,16 @@
   </div>
 
   <!-- Charts -->
-  <div class="section-title" style="margin-top:28px">Depth Tracks</div>
+  <div class="section-title" style="margin-top:28px">Crossplots</div>
   <div class="charts-grid">
     <div class="chart-card">
-      <div class="chart-title">PropEff &amp; DLS_CONT <span class="badge">vs Depth</span></div>
-      <div class="chart-sub">Blue = PropEff (%) · Orange = DLS_CONT scaled to 100% PropEff (deg/100ft)</div>
+      <div class="chart-title">PropEff vs DLS@100% <span class="badge">Crossplot</span></div>
+      <div class="chart-sub">Each dot = one depth sample &nbsp;·&nbsp; Color: <span style="color:#4f8ef7">■</span> shallow → <span style="color:#f74f7a">■</span> deep</div>
       <div class="chart-wrap"><canvas id="chartPropDls"></canvas></div>
     </div>
     <div class="chart-card">
-      <div class="chart-title">Shock Rate &amp; Stick Slip <span class="badge">vs Depth</span></div>
-      <div class="chart-sub">Orange = Shock Rate (1/s) · Green = Stick Slip (c/min)</div>
+      <div class="chart-title">Shock Rate vs Stick Slip <span class="badge">Crossplot</span></div>
+      <div class="chart-sub">Each dot = one depth sample &nbsp;·&nbsp; Color: <span style="color:#4f8ef7">■</span> shallow → <span style="color:#f74f7a">■</span> deep</div>
       <div class="chart-wrap"><canvas id="chartShockStick"></canvas></div>
     </div>
   </div>
@@ -564,74 +564,85 @@ function fmtBig(n) {
 // ─────────────────────────────────────────────
 let chart1 = null, chart2 = null;
 
-function downsample(arr, maxPoints = 600) {
-  if (arr.length <= maxPoints) return arr;
-  const step = Math.ceil(arr.length / maxPoints);
-  return arr.filter((_, i) => i % step === 0);
+// Depth colour gradient: blue (shallow) → orange (mid) → red (deep)
+function depthColor(t, alpha = 0.75) {
+  let r, g, b;
+  if (t < 0.5) {
+    const s = t * 2;
+    r = Math.round(79  + (247 - 79)  * s);
+    g = Math.round(142 + (147 - 142) * s);
+    b = Math.round(247 + (79  - 247) * s);
+  } else {
+    const s = (t - 0.5) * 2;
+    r = Math.round(247);
+    g = Math.round(147 + (79  - 147) * s);
+    b = Math.round(79  + (122 - 79)  * s);
+  }
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
-function makeDepthChart(canvasId, depth, datasets, existingChart) {
+function makeCrossplot(canvasId, points, xLabel, yLabel, existingChart) {
+  // points: [{x, y, depth}]
   if (existingChart) existingChart.destroy();
+  if (!points.length) return null;
+
+  const depths = points.map(p => p.depth);
+  const dMin = Math.min(...depths), dMax = Math.max(...depths);
+  const range = dMax - dMin || 1;
+
+  const colors = points.map(p => depthColor((p.depth - dMin) / range));
+
   const ctx = document.getElementById(canvasId).getContext('2d');
-
-  // Build point arrays: {x: value, y: depth}
-  const ds = datasets.map(d => ({
-    label: d.label,
-    data: depth.map((dep, i) => ({ x: d.values[i], y: dep })).filter(p => p.x !== null),
-    borderColor: d.color,
-    backgroundColor: d.color + '22',
-    borderWidth: 1.5,
-    pointRadius: 0,
-    tension: 0,
-    fill: false,
-    yAxisID: 'yDepth',
-    xAxisID: d.xAxis || 'x1',
-    parsing: false,
-  }));
-
   return new Chart(ctx, {
-    type: 'line',
-    data: { datasets: ds },
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: `${xLabel} vs ${yLabel}`,
+        data: points.map(p => ({ x: p.x, y: p.y, depth: p.depth })),
+        backgroundColor: colors,
+        borderColor: colors.map(c => c.replace(/[\d.]+\)$/, '1)')),
+        borderWidth: 0.3,
+        pointRadius: 3.5,
+        pointHoverRadius: 6,
+      }]
+    },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       animation: false,
-      interaction: { mode: 'index', intersect: false },
       scales: {
-        yDepth: {
+        x: {
           type: 'linear',
-          position: 'left',
-          reverse: true,
-          title: { display: true, text: 'Depth (ft)', color: '#7b82a0', font: { size: 11 } },
+          title: { display: true, text: xLabel, color: '#7b82a0', font: { size: 11 } },
           ticks: { color: '#7b82a0', font: { size: 10 } },
           grid: { color: '#2e3247' },
         },
-        x1: {
+        y: {
           type: 'linear',
-          position: 'bottom',
-          title: { display: true, text: datasets[0].label, color: datasets[0].color, font: { size: 10 } },
+          title: { display: true, text: yLabel, color: '#7b82a0', font: { size: 11 } },
           ticks: { color: '#7b82a0', font: { size: 10 } },
           grid: { color: '#2e3247' },
-        },
-        x2: {
-          type: 'linear',
-          position: 'top',
-          display: datasets.length > 1,
-          title: { display: true, text: datasets[1] ? datasets[1].label : '', color: datasets[1] ? datasets[1].color : '#fff', font: { size: 10 } },
-          ticks: { color: '#7b82a0', font: { size: 10 } },
-          grid: { display: false },
         }
       },
       plugins: {
-        legend: {
-          labels: { color: '#e2e6f0', font: { size: 11 }, boxWidth: 12 }
-        },
+        legend: { display: false },
         tooltip: {
           backgroundColor: '#1a1d27',
           borderColor: '#2e3247',
           borderWidth: 1,
           titleColor: '#e2e6f0',
           bodyColor: '#7b82a0',
+          callbacks: {
+            title: () => '',
+            label: item => {
+              const d = item.raw;
+              return [
+                `Depth: ${fmt(d.depth, 1)} ft`,
+                `${xLabel}: ${fmt(d.x, 2)}`,
+                `${yLabel}: ${fmt(d.y, 4)}`,
+              ];
+            }
+          }
         }
       }
     }
@@ -773,39 +784,45 @@ function renderDashboard(las, depthFrom, depthTo, cfg) {
     </tr>`;
   }).join('');
 
-  // ── Charts — downsample for performance
-  const N = rows.length;
-  const step2 = Math.max(1, Math.floor(N / 600));
-  const dIdx = Array.from({length: N}, (_, i) => i).filter(i => i % step2 === 0);
+  // ── Crossplots — build point arrays (max 800 pts each for performance)
+  const MAX_PTS = 800;
 
-  const depSamp = dIdx.map(i => depth ? depth[i] : i * 0.5 + 238.5);
-
-  // Chart 1: PropEff + DLS@100
-  const propSamp = dIdx.map(i => {
-    const v = propEff ? propEff[i] : null;
-    return (v !== null && v > 0 && v <= 100) ? v : null;
-  });
-  const dls100Samp = dIdx.map(i => {
+  // Chart 1: PropEff (X) vs DLS@100% (Y), coloured by depth
+  const crossPropDls = [];
+  for (let i = 0; i < (depth || []).length; i++) {
+    const dep = depth ? depth[i] : null;
     const pe  = propEff ? propEff[i] : null;
     const dls = dlsCont ? dlsCont[i] : null;
-    if (pe === null || dls === null || pe <= 0 || pe > 100 || dls > computedThreshold) return null;
+    if (dep === null || pe === null || dls === null) continue;
+    if (pe <= 0 || pe > 100 || dls > computedThreshold) continue;
     const scaled = dls * (100 / pe);
-    return scaled > computedThreshold ? null : scaled;
-  });
+    if (scaled > computedThreshold) continue;
+    crossPropDls.push({ x: pe, y: scaled, depth: dep });
+  }
+  const step1 = Math.max(1, Math.floor(crossPropDls.length / MAX_PTS));
+  chart1 = makeCrossplot(
+    'chartPropDls',
+    crossPropDls.filter((_, i) => i % step1 === 0),
+    'PropEff (%)', 'DLS@100% (deg/100ft)',
+    chart1
+  );
 
-  chart1 = makeDepthChart('chartPropDls', depSamp, [
-    { label: 'PropEff (%)', values: propSamp, color: '#4f8ef7', xAxis: 'x1' },
-    { label: 'DLS@100% (deg/100ft)', values: dls100Samp, color: '#f7934f', xAxis: 'x2' },
-  ], chart1);
-
-  // Chart 2: Shock + Stick
-  const shkSamp = dIdx.map(i => shockArr ? shockArr[i] : null);
-  const stickSamp = dIdx.map(i => stick ? stick[i] : null);
-
-  chart2 = makeDepthChart('chartShockStick', depSamp, [
-    { label: 'Shock Rate (1/s)', values: shkSamp, color: '#f7934f', xAxis: 'x1' },
-    { label: 'Stick Slip (c/min)', values: stickSamp, color: '#4fc97f', xAxis: 'x2' },
-  ], chart2);
+  // Chart 2: Shock Rate (X) vs Stick Slip (Y), coloured by depth
+  const crossShkStk = [];
+  for (let i = 0; i < (depth || []).length; i++) {
+    const dep  = depth    ? depth[i]    : null;
+    const shk  = shockArr ? shockArr[i] : null;
+    const stk  = stick    ? stick[i]    : null;
+    if (dep === null || shk === null || stk === null) continue;
+    crossShkStk.push({ x: shk, y: stk, depth: dep });
+  }
+  const step3 = Math.max(1, Math.floor(crossShkStk.length / MAX_PTS));
+  chart2 = makeCrossplot(
+    'chartShockStick',
+    crossShkStk.filter((_, i) => i % step3 === 0),
+    'Shock Rate (1/s)', 'Stick Slip (c/min)',
+    chart2
+  );
 
   // Show dashboard
   document.getElementById('mainContent').style.display = 'block';
@@ -897,7 +914,7 @@ zone.addEventListener('click', e => {
 </script>
 
 <footer style="text-align:center;padding:20px 24px;font-size:11px;color:#4a5070;border-top:1px solid #2e3247;margin-top:8px;">
-  LAS Drilling Data Analyzer &nbsp;·&nbsp; <strong style="color:#7b82a0">v2.0.0</strong> &nbsp;·&nbsp; RSS / MWD Performance Analysis
+  LAS Drilling Data Analyzer &nbsp;·&nbsp; <strong style="color:#7b82a0">v2.1.0</strong> &nbsp;·&nbsp; RSS / MWD Performance Analysis
 </footer>
 
 </body>
