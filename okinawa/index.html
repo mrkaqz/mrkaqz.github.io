@@ -110,6 +110,15 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
 .day-card.open .chevron { transform:rotate(180deg); }
 .day-body { display:none; padding:4px 20px 20px; border-top:1px solid rgba(0,104,168,.07); }
 .day-card.open .day-body { display:block; }
+.wx-bar { display:flex; align-items:center; flex-wrap:wrap; gap:8px; background:linear-gradient(135deg,#e8f4fd,#d4ecfa); border:1px solid #b0d9f5; border-radius:11px; padding:9px 13px; margin-bottom:12px; font-size:12px; }
+.wx-bar .wx-icon { font-size:22px; }
+.wx-bar .wx-info { flex:1; min-width:160px; }
+.wx-bar .wx-temp { font-size:14px; font-weight:700; color:#004a80; }
+.wx-bar .wx-desc { color:#005a9e; margin-top:1px; }
+.wx-bar .wx-chips { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+.wx-bar .wx-chip { background:#fff; border:1px solid #b0d9f5; color:#0068a8; font-size:11px; padding:2px 7px; border-radius:8px; }
+.wx-bar .wx-note { font-size:11px; color:#7a4a00; background:#fff8e6; border:1px solid #f0d080; border-radius:8px; padding:3px 8px; }
+.wx-bar .wx-rain { font-size:11px; color:#b03020; background:#fff0ef; border:1px solid #f5b0a8; border-radius:8px; padding:3px 8px; font-weight:600; }
 
 /* ─── DAY COLORS ─── */
 .d1 .day-hd{background:linear-gradient(135deg,#e4f2fc,#cce6f8)} .d1 .day-badge{background:#0068a8}
@@ -362,6 +371,21 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
       <span class="chevron">▾</span>
     </div>
     <div class="day-body">
+      <div class="wx-bar">
+        <div class="wx-icon">🌦️</div>
+        <div class="wx-info">
+          <div class="wx-temp">29°C / 24°C · อาทิตย์ 14 มิ.ย.</div>
+          <div class="wx-desc">เมฆมาก มีฝนระหว่างวัน · ช่วงฤดูฝน (Tsuyu)</div>
+          <div class="wx-chips">
+            <span class="wx-chip">💧 โอกาสฝน ~60%</span>
+            <span class="wx-chip">💨 ลม SW 20 km/h</span>
+            <span class="wx-chip">🌊 ทะเล 27°C</span>
+            <span class="wx-chip">☀️ UV สูงมาก</span>
+            <span class="wx-chip">💦 ความชื้น ~84%</span>
+          </div>
+        </div>
+        <span class="wx-note">⚠️ นี่คือค่าเฉลี่ยประวัติศาสตร์ · เช็ค forecast จริงก่อนเดินทาง</span>
+      </div>
       <div class="timeline">
 
         <div class="tl-item">
@@ -471,6 +495,21 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
       <span class="chevron">▾</span>
     </div>
     <div class="day-body">
+      <div class="wx-bar">
+        <div class="wx-icon">☔</div>
+        <div class="wx-info">
+          <div class="wx-temp">29°C / 24°C · จันทร์ 15 มิ.ย.</div>
+          <div class="wx-desc">มีโอกาสฝนตลอดวัน · วันเที่ยวในร่มเหมาะมาก</div>
+          <div class="wx-chips">
+            <span class="wx-chip">💧 โอกาสฝน ~60%</span>
+            <span class="wx-chip">💨 ลม SW 20 km/h</span>
+            <span class="wx-chip">🌊 ทะเล 27°C</span>
+            <span class="wx-chip">☀️ UV สูงมาก</span>
+            <span class="wx-chip">💦 ความชื้น ~84%</span>
+          </div>
+        </div>
+        <span class="wx-rain">🌧️ Day 2 มีกิจกรรมในร่มเยอะ (ถ้ำ Gyokusendo, Shuri Castle) เหมาะแม้ฝนตก</span>
+      </div>
       <div class="timeline">
 
         <div class="sec-label">🌊 ออกเดินทางทางใต้ก่อน</div>
@@ -580,6 +619,21 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
       <span class="chevron">▾</span>
     </div>
     <div class="day-body">
+      <div class="wx-bar">
+        <div class="wx-icon">🌤️</div>
+        <div class="wx-info">
+          <div class="wx-temp">30°C / 24°C · อังคาร 16 มิ.ย.</div>
+          <div class="wx-desc">ร้อนชื้น มีโอกาสฝนบ่าย · ช่วงเช้าอากาศดีกว่า</div>
+          <div class="wx-chips">
+            <span class="wx-chip">💧 โอกาสฝน ~55%</span>
+            <span class="wx-chip">💨 ลม SW 18 km/h</span>
+            <span class="wx-chip">🌊 ทะเล 27°C</span>
+            <span class="wx-chip">☀️ UV สูงมาก</span>
+            <span class="wx-chip">💦 ความชื้น ~83%</span>
+          </div>
+        </div>
+        <span class="wx-note">🌊 Araha Beach — หากฝนตกหนักอาจเปลี่ยนเป็น ช้อปใน American Village แทน</span>
+      </div>
       <div class="timeline">
 
         <div class="tl-item">
@@ -722,6 +776,21 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
       <span class="chevron">▾</span>
     </div>
     <div class="day-body">
+      <div class="wx-bar">
+        <div class="wx-icon">🌦️</div>
+        <div class="wx-info">
+          <div class="wx-temp">30°C / 24°C · พุธ 17 มิ.ย.</div>
+          <div class="wx-desc">ฟ้าครึ้ม มีโอกาสฝนระหว่างวัน</div>
+          <div class="wx-chips">
+            <span class="wx-chip">💧 โอกาสฝน ~55%</span>
+            <span class="wx-chip">💨 ลม SW 18 km/h</span>
+            <span class="wx-chip">🌊 ทะเล 27°C</span>
+            <span class="wx-chip">☀️ UV สูงมาก</span>
+            <span class="wx-chip">💦 ความชื้น ~83%</span>
+          </div>
+        </div>
+        <span class="wx-note">🐋 Churaumi Aquarium และ Emerald Beach ยังสนุกได้แม้ฟ้าครึ้ม</span>
+      </div>
       <div class="timeline">
 
         <div class="tl-item">
@@ -846,6 +915,21 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
       <span class="chevron">▾</span>
     </div>
     <div class="day-body">
+      <div class="wx-bar">
+        <div class="wx-icon">🌦️</div>
+        <div class="wx-info">
+          <div class="wx-temp">30°C / 24°C · พฤหัส 18 มิ.ย.</div>
+          <div class="wx-desc">ร้อนชื้น มีโอกาสฝน · วันเทศกาล Haarii Festival</div>
+          <div class="wx-chips">
+            <span class="wx-chip">💧 โอกาสฝน ~55%</span>
+            <span class="wx-chip">💨 ลม SW 18 km/h</span>
+            <span class="wx-chip">🌊 ทะเล 27°C เหมาะ Snorkel</span>
+            <span class="wx-chip">☀️ UV สูงมาก</span>
+            <span class="wx-chip">💦 ความชื้น ~83%</span>
+          </div>
+        </div>
+        <span class="wx-rain">🎏 18 มิ.ย. = วันเทศกาล Haarii (ประเพณีเรือมังกร) อาจมีงานบนเกาะ Kouri</span>
+      </div>
       <div class="timeline">
 
         <div class="tl-item">
@@ -973,6 +1057,21 @@ body { font-family:'Noto Sans Thai',sans-serif; background:var(--paper); color:v
       <span class="chevron">▾</span>
     </div>
     <div class="day-body">
+      <div class="wx-bar">
+        <div class="wx-icon">🌤️</div>
+        <div class="wx-info">
+          <div class="wx-temp">30°C / 24°C · ศุกร์ 19 มิ.ย.</div>
+          <div class="wx-desc">ร้อนชื้น โอกาสฝนลดลงเล็กน้อย</div>
+          <div class="wx-chips">
+            <span class="wx-chip">💧 โอกาสฝน ~50%</span>
+            <span class="wx-chip">💨 ลม SW 15 km/h</span>
+            <span class="wx-chip">🌊 ทะเล 27°C</span>
+            <span class="wx-chip">☀️ UV สูงมาก</span>
+            <span class="wx-chip">💦 ความชื้น ~82%</span>
+          </div>
+        </div>
+        <span class="wx-note">✈️ วันกลับบ้าน · เช็คเอาท์ก่อน 11:00 · เที่ยวบิน 16:55 มีเวลาช้อปปิ้งพอ</span>
+      </div>
       <div class="timeline">
 
         <div class="sec-label">🍳 มื้อเช้า</div>
