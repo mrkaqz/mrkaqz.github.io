@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Simple Downlink - Pro</title>
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Downlink">
-    <link rel="apple-touch-icon" href="icon-256.png">
     <link rel="manifest" href="manifest.json">
     
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -363,10 +358,19 @@
             margin-top: auto; /* Push footer to bottom if screen is tall */
         }
 
-        /* Helper Classes */
-        .text-green { color: var(--accent-green) !important; }
-        .text-orange { color: var(--accent-orange) !important; }
-        .text-neutral { color: var(--text-main) !important; }
+        /* COMMAND DESCRIPTION */
+        #cmdDescription {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            color: var(--text-main);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
         /* PD MAP BUTTON */
         #mapButton {
@@ -437,6 +441,11 @@
             text-transform: none;
         }
 
+        /* Helper Classes */
+        .text-green { color: var(--accent-green) !important; }
+        .text-orange { color: var(--accent-orange) !important; }
+        .text-neutral { color: var(--text-main) !important; }
+
     </style>
 </head>
 <body>
@@ -488,6 +497,14 @@
 
         <div class="controls-area">
             <div class="settings-grid">
+                <div>
+                    <label>Tool Version</label>
+                    <select id="toolSelect" onchange="updatePageSelect()"></select>
+                </div>
+                <div>
+                    <label>Page / Mode</label>
+                    <select id="pageSelect" onchange="updateDescription()"></select>
+                </div>
                 <div>
                     <label>Bit Period</label>
                     <select id="bitSelect" onchange="cmdUpdate()">
@@ -569,6 +586,8 @@
                 </div>
             </div>
 
+            <div id="cmdDescription">Select a command to see its description.</div>
+
             <div class="btn-group">
                 <button id="startButton">Start</button>
                 <button id="stopButton">Stop</button>
@@ -578,7 +597,7 @@
     </main>
 
     <footer>
-        <p>Simple Downlink v4.5 03-Mar-26 by https://ronnarong.dev</p>
+        <p>Simple Downlink v4.3 01-Jun-26 by https://ronnarong.dev</p>
     </footer>
 
     <script src="DLTime.js"></script>
@@ -670,6 +689,8 @@
                 document.getElementById("startButton").disabled = true;
                 document.getElementById("bitSelect").disabled = true;
                 document.getElementById("cmdSelect").disabled = true;
+                document.getElementById("toolSelect").disabled = true;
+                document.getElementById("pageSelect").disabled = true;
                 
                 safePlayBeep(shortBeepDuration);
                 dotX = 0;
@@ -689,6 +710,8 @@
             document.getElementById("startButton").disabled = false;
             document.getElementById("bitSelect").disabled = false;
             document.getElementById("cmdSelect").disabled = false;
+            document.getElementById("toolSelect").disabled = false;
+            document.getElementById("pageSelect").disabled = false;
             
             elapsedTime = 0; 
             lastProcessedSecond = -1;
@@ -864,25 +887,88 @@
         function cmdUpdate() {
             cmd = document.getElementById("cmdSelect").value;
             bitPreiod = parseInt(document.getElementById("bitSelect").value);
-            
+
             beepSq = DLTime(cmd);
-            
+
             beepTimes = beepSq.map((element) => element * bitPreiod);
             endInterval = beepTimes[beepTimes.length - 1]*1000 + 1000;
-            
+
             if (cmd != "0-0") {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawLine();
             }
+            updateDescription();
         }
 
         document.getElementById("startButton").addEventListener("click", startTimer);
         document.getElementById("stopButton").addEventListener("click", stopTimer);
 
-        // Close map modal when clicking backdrop
-        document.getElementById("mapModal").addEventListener("click", function(e) {
-            if (e.target === this) this.classList.remove("open");
-        });
+        // --- COMMAND DESCRIPTION LOGIC ---
+        var descMap = {};
+
+        async function loadCommandData() {
+            try {
+                const res = await fetch('PowerDrive.xml');
+                const text = await res.text();
+                const xml = new DOMParser().parseFromString(text, 'text/xml');
+                xml.querySelectorAll('Tool').forEach(tool => {
+                    const toolName = tool.querySelector('Name').textContent;
+                    descMap[toolName] = {};
+                    tool.querySelectorAll('CommandList').forEach(cl => {
+                        const modeNum = cl.querySelector('Mode').textContent;
+                        const modeDesc = modeNum + ' - ' + cl.querySelector('ModeDescription').textContent;
+                        descMap[toolName][modeDesc] = {};
+                        cl.querySelectorAll('Commands').forEach(cmds => {
+                            const precursor = cmds.querySelector('Precursor').textContent;
+                            cmds.querySelectorAll('Command').forEach(c => {
+                                const id = c.querySelector('Id').textContent;
+                                const desc = c.querySelector('Description').textContent;
+                                descMap[toolName][modeDesc][precursor + '-' + id] = desc;
+                            });
+                        });
+                    });
+                });
+                const toolSelect = document.getElementById('toolSelect');
+                Object.keys(descMap).forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = name;
+                    toolSelect.appendChild(opt);
+                });
+                toolSelect.value = 'PowerDrive V4.6';
+                updatePageSelect();
+            } catch (e) {
+                console.error('Failed to load PowerDrive.xml', e);
+            }
+        }
+
+        function updatePageSelect() {
+            const tool = document.getElementById('toolSelect').value;
+            const pageSelect = document.getElementById('pageSelect');
+            pageSelect.innerHTML = '';
+            Object.keys(descMap[tool] || {}).forEach(mode => {
+                const opt = document.createElement('option');
+                opt.value = mode;
+                opt.textContent = mode;
+                pageSelect.appendChild(opt);
+            });
+            updateDescription();
+        }
+
+        function updateDescription() {
+            const cmdVal = document.getElementById('cmdSelect').value;
+            const tool = document.getElementById('toolSelect').value;
+            const page = document.getElementById('pageSelect').value;
+            const el = document.getElementById('cmdDescription');
+            if (cmdVal === '0-0') {
+                el.textContent = 'Select a command to see its description.';
+                return;
+            }
+            const desc = descMap[tool]?.[page]?.[cmdVal];
+            el.textContent = desc ?? 'No description available for this command.';
+        }
+
+        loadCommandData();
 
         window.addEventListener('resize', function() {
             canvas.width = canvas.parentElement.offsetWidth;
@@ -918,5 +1004,4 @@
         }
     </script>
 </body>
-
 </html>
