@@ -18,7 +18,7 @@
 
     <script type="module">
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('pwabuilder-sw.js');
+            navigator.serviceWorker.register('pwabuilder-sw.js', { updateViaCache: 'none' });
         };
     </script>
 
