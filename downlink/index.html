@@ -360,16 +360,12 @@
 
         /* COMMAND DESCRIPTION */
         #cmdDescription {
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            font-size: 0.9rem;
-            color: var(--text-main);
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin-top: 8px;
+            font-weight: 600;
+            min-height: 1.2em;
         }
 
         /* PD MAP BUTTON */
@@ -478,6 +474,7 @@
         <div id="statusCard" class="status-card">
             <div class="state-label">Current Pump/RPM State</div>
             <h1 id="state" class="text-neutral">READY</h1>
+            <div id="cmdDescription"></div>
         </div>
 
         <div class="timer-grid">
@@ -586,8 +583,6 @@
                 </div>
             </div>
 
-            <div id="cmdDescription">Select a command to see its description.</div>
-
             <div class="btn-group">
                 <button id="startButton">Start</button>
                 <button id="stopButton">Stop</button>
@@ -597,7 +592,7 @@
     </main>
 
     <footer>
-        <p>Simple Downlink v4.6 01-Jun-26 by https://ronnarong.dev</p>
+        <p>Simple Downlink v4.7 02-Jun-26 by https://ronnarong.dev</p>
     </footer>
 
     <script src="DLTime.js"></script>
