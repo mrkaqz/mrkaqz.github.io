@@ -1,9 +1,11 @@
-const CACHE = "downlink-v4.3";
+const CACHE = "downlink-v4.6";
 
 const APP_ASSETS = [
   "./",
   "./index.html",
   "./DLTime.js",
+  "./PowerDrive.xml",
+  "./PD-Map.webp",
   "./manifest.json",
   "./icon-72.png",
   "./icon-96.png",
