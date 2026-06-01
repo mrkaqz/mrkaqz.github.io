@@ -19,6 +19,13 @@
     <script type="module">
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('pwabuilder-sw.js');
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
         };
     </script>
 
