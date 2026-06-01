@@ -1,4 +1,4 @@
-const CACHE = "downlink-v4.7";
+const CACHE = "downlink-v4.7.1";
 
 const APP_ASSETS = [
   "./",
