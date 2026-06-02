@@ -501,7 +501,7 @@ function calcDLSat100(propEffArr, dlsArr, cfg) {
     const dls = dlsArr[i];
     if (pe === null || dls === null) continue;
     if (pe <= 0 || pe > 100) continue;
-    if (dls > threshold) continue;
+    if (dls < 0 || dls > threshold) continue;
     const dls100 = dls * (100 / pe);
     if (dls100 > threshold) continue;
     result.push({ idx: i, pe, dls, dls100, threshold });
@@ -737,14 +737,14 @@ function renderDashboard(las, depthFrom, depthTo, cfg) {
     dlsMwdStat.avg !== null ? fmt(dlsMwdStat.avg) + ' deg/100ft' : 'N/A';
 
   // ── Shock
-  const validShock = (shockArr || []).filter(v => v !== null);
+  const validShock = (shockArr || []).filter(v => v !== null && v >= 0);
   const shkStat = stats(validShock);
   document.getElementById('shkAvg').textContent = fmt(shkStat.avg, 3);
   document.getElementById('shkMax').textContent = fmt(shkStat.max, 3) + ' 1/s';
   document.getElementById('shkCount').textContent = fmtBig(shkStat.count);
 
   // ── Stick Slip
-  const validStick = (stick || []).filter(v => v !== null);
+  const validStick = (stick || []).filter(v => v !== null && v >= 0);
   const stickStat = stats(validStick);
   document.getElementById('stickAvg').textContent = fmt(stickStat.avg, 1);
   document.getElementById('stickMax').textContent = fmt(stickStat.max, 1) + ' c/min';
@@ -794,7 +794,7 @@ function renderDashboard(las, depthFrom, depthTo, cfg) {
     const pe  = propEff ? propEff[i] : null;
     const dls = dlsCont ? dlsCont[i] : null;
     if (dep === null || pe === null || dls === null) continue;
-    if (pe <= 0 || pe > 100 || dls > computedThreshold) continue;
+    if (pe <= 0 || pe > 100 || dls < 0 || dls > computedThreshold) continue;
     const scaled = dls * (100 / pe);
     if (scaled > computedThreshold) continue;
     crossPropDls.push({ x: pe, y: scaled, depth: dep });
@@ -814,6 +814,7 @@ function renderDashboard(las, depthFrom, depthTo, cfg) {
     const shk  = shockArr ? shockArr[i] : null;
     const stk  = stick    ? stick[i]    : null;
     if (dep === null || shk === null || stk === null) continue;
+    if (shk < 0 || stk < 0) continue;
     crossShkStk.push({ x: shk, y: stk, depth: dep });
   }
   const step3 = Math.max(1, Math.floor(crossShkStk.length / MAX_PTS));
