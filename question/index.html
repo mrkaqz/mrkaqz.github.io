@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Viewer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+
+  /* ── sticky header ── */
+  #header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  #header h1 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2563eb;
+    white-space: nowrap;
+  }
+
+  #file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  #file-label:hover { background: #1d4ed8; }
+  #file-input { display: none; }
+
+  #search-wrap {
+    flex: 1;
+    min-width: 180px;
+    position: relative;
+  }
+  #search {
+    width: 100%;
+    padding: 7px 12px 7px 34px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #search:focus { border-color: #2563eb; }
+  #search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+  }
+
+  #count {
+    font-size: 0.8rem;
+    color: #6b7280;
+    white-space: nowrap;
+  }
+
+  /* ── main content ── */
+  #main {
+    max-width: 860px;
+    margin: 24px auto;
+    padding: 0 16px 40px;
+  }
+
+  /* ── drop zone / welcome ── */
+  #welcome {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+  }
+  #welcome svg { display: block; margin: 0 auto 16px; }
+  #welcome p { font-size: 1rem; }
+
+  #error-msg {
+    display: none;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+  }
+
+  /* ── question card ── */
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .card.hidden { display: none; }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .q-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .q-stem {
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .q-type {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #9ca3af;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 99px;
+    margin-top: 3px;
+    white-space: nowrap;
+  }
+
+  /* ── options ── */
+  .options { display: flex; flex-direction: column; gap: 6px; padding-left: 38px; }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+  }
+  .option.correct {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    color: #166534;
+    font-weight: 600;
+  }
+  .option.incorrect {
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+  }
+  .option-icon {
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+    font-size: 0.85rem;
+    margin-top: 1px;
+  }
+
+  /* ── ordered list (FillInBlank) ── */
+  .ordered-steps {
+    padding-left: 38px;
+    list-style: decimal;
+    padding-left: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .ordered-steps li {
+    font-size: 0.88rem;
+    line-height: 1.4;
+    padding: 5px 0;
+    color: #166534;
+    font-weight: 600;
+  }
+
+  /* ── dragdrop fallback ── */
+  .dd-note {
+    padding-left: 38px;
+    font-size: 0.82rem;
+    color: #6b7280;
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+  .dd-items {
+    padding-left: 38px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .dd-item {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    color: #374151;
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>Question Viewer</h1>
+  <label id="file-label" for="file-input">
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+    </svg>
+    Load File
+  </label>
+  <input type="file" id="file-input" accept=".download,.js,.json">
+  <div id="search-wrap">
+    <svg id="search-icon" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+    </svg>
+    <input type="search" id="search" placeholder="Search questions or answers…" disabled>
+  </div>
+  <span id="count"></span>
+</div>
+
+<div id="main">
+  <div id="error-msg"></div>
+  <div id="welcome">
+    <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="#d1d5db" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0
+           002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424
+           48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664
+           0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75
+           0-.231-.035-.454-.1-.664M6.75 7.5H4.875c-.621
+           0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125
+           1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9
+           9 0 00-9-9z"/>
+    </svg>
+    <p>Click <strong>Load File</strong> and select your <code>questionData.js.download</code> file.</p>
+  </div>
+  <div id="questions"></div>
+</div>
+
+<script>
+(function () {
+  const fileInput  = document.getElementById('file-input');
+  const searchBox  = document.getElementById('search');
+  const countEl    = document.getElementById('count');
+  const questionsEl= document.getElementById('questions');
+  const welcomeEl  = document.getElementById('welcome');
+  const errorEl    = document.getElementById('error-msg');
+
+  let allCards = [];
+
+  // ── file loading ──────────────────────────────────────────────
+  fileInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      parse(e.target.result);
+    };
+    reader.readAsText(file);
+  });
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+    welcomeEl.style.display = 'none';
+  }
+
+  function parse(raw) {
+    errorEl.style.display = 'none';
+    let json;
+    try {
+      // strip AMD define(...) wrapper — find first { and last }
+      const start = raw.indexOf('{');
+      const end   = raw.lastIndexOf('}');
+      if (start === -1 || end === -1) throw new Error('No JSON object found.');
+      json = JSON.parse(raw.slice(start, end + 1));
+    } catch (err) {
+      showError('Could not parse file: ' + err.message);
+      return;
+    }
+    if (!json.questions || typeof json.questions !== 'object') {
+      showError('File parsed but no "questions" object was found. Is this the right file?');
+      return;
+    }
+    render(json.questions);
+  }
+
+  // ── rendering ─────────────────────────────────────────────────
+  function render(questions) {
+    welcomeEl.style.display = 'none';
+    questionsEl.innerHTML   = '';
+    allCards = [];
+    searchBox.disabled = false;
+    searchBox.value    = '';
+
+    const entries = Object.values(questions);
+    entries.forEach(function (q, idx) {
+      const card = buildCard(q, idx + 1);
+      questionsEl.appendChild(card.el);
+      allCards.push(card);
+    });
+
+    updateCount(allCards.length, allCards.length);
+  }
+
+  function buildCard(q, num) {
+    const type     = (q.type || '').toLowerCase();
+    const stem     = q.questionstem || '(no question text)';
+    const typeLabel = type === 'multiplechoice' ? 'Multiple Choice'
+                    : type === 'fillinblank'    ? 'Ordering'
+                    : type === 'dragdrop'       ? 'Drag & Drop'
+                    : q.type || 'Unknown';
+
+    const el = document.createElement('div');
+    el.className = 'card';
+
+    // header row
+    const header = document.createElement('div');
+    header.className = 'card-header';
+
+    const numEl = document.createElement('div');
+    numEl.className = 'q-num';
+    numEl.textContent = num;
+
+    const stemEl = document.createElement('div');
+    stemEl.className = 'q-stem';
+    stemEl.textContent = stem;
+
+    const typeEl = document.createElement('div');
+    typeEl.className = 'q-type';
+    typeEl.textContent = typeLabel;
+
+    header.appendChild(numEl);
+    header.appendChild(stemEl);
+    header.appendChild(typeEl);
+    el.appendChild(header);
+
+    // body
+    let searchText = stem.toLowerCase();
+
+    if (type === 'multiplechoice') {
+      const optionsEl = document.createElement('div');
+      optionsEl.className = 'options';
+      const opts = Array.isArray(q.option) ? q.option : [];
+      opts.forEach(function (opt) {
+        const isCorrect = opt.iscorrect === 'true';
+        const text      = opt.distractor || '';
+        searchText += ' ' + text.toLowerCase();
+
+        const row = document.createElement('div');
+        row.className = 'option ' + (isCorrect ? 'correct' : 'incorrect');
+
+        const icon = document.createElement('span');
+        icon.className = 'option-icon';
+        icon.textContent = isCorrect ? '✓' : '○';
+
+        const label = document.createElement('span');
+        label.textContent = text;
+
+        row.appendChild(icon);
+        row.appendChild(label);
+        optionsEl.appendChild(row);
+      });
+      el.appendChild(optionsEl);
+
+    } else if (type === 'fillinblank') {
+      const steps = decodeOrdering(q);
+      const ol = document.createElement('ol');
+      ol.className = 'ordered-steps';
+      steps.forEach(function (stepText) {
+        searchText += ' ' + stepText.toLowerCase();
+        const li = document.createElement('li');
+        li.textContent = stepText;
+        ol.appendChild(li);
+      });
+      el.appendChild(ol);
+
+    } else if (type === 'dragdrop') {
+      const note = document.createElement('p');
+      note.className = 'dd-note';
+      note.textContent = 'Visual drag-and-drop question — image labels listed below:';
+      el.appendChild(note);
+
+      const items = document.createElement('div');
+      items.className = 'dd-items';
+
+      const dragObjects = (q.dragobjects && q.dragobjects.dragobject) || [];
+      const arr = Array.isArray(dragObjects) ? dragObjects : [dragObjects];
+      if (arr.length === 0) {
+        const none = document.createElement('span');
+        none.className = 'dd-item';
+        none.textContent = '(no items)';
+        items.appendChild(none);
+      }
+      arr.forEach(function (obj) {
+        const img = obj.dragtype && obj.dragtype.dragimage;
+        const label = (img && (img.objectlabel || img.alttext || img.uri.split('/').pop())) || '(item)';
+        searchText += ' ' + label.toLowerCase();
+        const chip = document.createElement('span');
+        chip.className = 'dd-item';
+        chip.textContent = label;
+        items.appendChild(chip);
+      });
+      el.appendChild(items);
+    }
+
+    return { el: el, searchText: searchText };
+  }
+
+  // ── FillInBlank decode ────────────────────────────────────────
+  function decodeOrdering(q) {
+    try {
+      const fc     = q.fillincontent;
+      const texts  = Array.isArray(fc.text) ? fc.text : [];
+      const blanks = Array.isArray(fc.blank) ? fc.blank : [];
+
+      const pairs = texts.map(function (stepText, i) {
+        const blank   = blanks[i];
+        const choices = blank && blank.dropdownlist && blank.dropdownlist.choice || [];
+        const correct = choices.find(function (c) { return c.iscorrect === 'true'; });
+        const order   = correct ? parseInt(correct.text, 10) : i + 1;
+        return { order: order, text: stepText };
+      });
+
+      pairs.sort(function (a, b) { return a.order - b.order; });
+      return pairs.map(function (p) { return p.text; });
+    } catch (_) {
+      return q.fillincontent && Array.isArray(q.fillincontent.text)
+        ? q.fillincontent.text
+        : ['(Could not decode ordering)'];
+    }
+  }
+
+  // ── search / filter ───────────────────────────────────────────
+  searchBox.addEventListener('input', function () {
+    const query = this.value.trim().toLowerCase();
+    let visible = 0;
+    allCards.forEach(function (card) {
+      const match = !query || card.searchText.includes(query);
+      card.el.classList.toggle('hidden', !match);
+      if (match) visible++;
+    });
+    if (allCards.length) updateCount(visible, allCards.length);
+  });
+
+  function updateCount(visible, total) {
+    countEl.textContent = visible === total
+      ? total + ' question' + (total !== 1 ? 's' : '')
+      : visible + ' of ' + total + ' matching';
+  }
+})();
+</script>
+</body>
+</html>
