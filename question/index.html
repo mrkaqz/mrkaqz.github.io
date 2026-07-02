@@ -330,6 +330,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     render(json.questions);
   }
 
+  // ── xml/html tag stripper ─────────────────────────────────────
+  function stripXml(str) {
+    if (!str || !str.includes('<')) return str;
+    const div = document.createElement('div');
+    div.innerHTML = str;
+    return (div.textContent || div.innerText || str).trim();
+  }
+
   // ── rendering ─────────────────────────────────────────────────
   function render(questions) {
     welcomeEl.style.display = 'none';
@@ -350,7 +358,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   function buildCard(q, num) {
     const type     = (q.type || '').toLowerCase();
-    const stem     = q.questionstem || '(no question text)';
+    const stem     = stripXml(q.questionstem || '(no question text)');
     const typeLabel = type === 'multiplechoice' ? 'Multiple Choice'
                     : type === 'fillinblank'    ? 'Ordering'
                     : type === 'dragdrop'       ? 'Drag & Drop'
@@ -389,7 +397,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       const opts = Array.isArray(q.option) ? q.option : [];
       opts.forEach(function (opt) {
         const isCorrect = opt.iscorrect === 'true';
-        const text      = opt.distractor || '';
+        const text      = stripXml(opt.distractor || '');
         searchText += ' ' + text.toLowerCase();
 
         const row = document.createElement('div');
