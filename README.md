@@ -6,7 +6,7 @@ Personal site hosted on GitHub Pages at **[ronnarong.dev](https://www.ronnarong.
 
 | Project | Description | Stack |
 |---------|-------------|-------|
-| [Simple Downlink](/downlink/) | Timing tool for satellite downlink command sequences. Generates precise HIGH/LOW signals with audio feedback. | PWA · v4.7 |
+| [Simple Downlink](/downlink/) | Timing tool for satellite downlink command sequences. Generates precise HIGH/LOW signals with audio feedback. | PWA · v4.7.2 |
 | [Queue](https://github.com/mrkaqz/queue) | Lightweight, self-hosted queue management system for small businesses (clinics, shops, service counters). TV display, operator panel, PWA push notifications & voice announcements. | Python · Docker · PWA |
 | [Read Screen](https://github.com/mrkaqz/readscreen) | Windows OCR utility that captures live directional drilling surveys (Depth, Inc, Az) from the Rig Floor Console and exports to CSV. | Python · v1.5 |
 | [LAS Analyzer](/las-analyzer/) | Browser-based tool for analyzing MWD/RSS drilling data from LAS 2.0 files. Drag-and-drop upload, outlier filtering, and interactive crossplot charts. | HTML · v2.1.0 |
