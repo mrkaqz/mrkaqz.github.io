@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Question Viewer</title>
-
+ 
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -209,6 +209,24 @@
     font-weight: 600;
   }
 
+  /* ── numeric fill-in-the-blank answer ── */
+  .blank-answer-wrap {
+    padding-left: 38px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .blank-answer {
+    display: inline-block;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    color: #166534;
+  }
+
   /* ── dragdrop fallback ── */
   .dd-note {
     padding-left: 38px;
@@ -231,6 +249,30 @@
     font-size: 0.8rem;
     color: #374151;
   }
+
+  /* ── matching pairs (MatchingActivity) ── */
+  .match-list { display: flex; flex-direction: column; gap: 6px; padding-left: 38px; }
+  .match-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    color: #166534;
+    font-weight: 600;
+  }
+  .match-arrow { flex-shrink: 0; color: #16a34a; }
+  .match-left, .match-right { flex: 1; }
+  .match-right { text-align: right; }
+  /* term → long-definition variant: left-align and give the definition room */
+  .match-list.defs .match-row { align-items: flex-start; }
+  .match-list.defs .match-arrow { margin-top: 1px; }
+  .match-list.defs .match-left { flex: 1; }
+  .match-list.defs .match-right { flex: 2.5; text-align: left; font-weight: 500; }
 
   /* ── footer ── */
   footer {
@@ -292,7 +334,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div id="questions"></div>
 </div>
 
-<footer>Question Viewer &mdash; v1.0</footer>
+<footer>Question Viewer &mdash; v2.0</footer>
 
 <script>
 (function () {
@@ -371,9 +413,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   function buildCard(q, num) {
     const type     = (q.type || '').toLowerCase();
     const stem     = stripXml(q.questionstem || '(no question text)');
-    const typeLabel = type === 'multiplechoice' ? 'Multiple Choice'
-                    : type === 'fillinblank'    ? 'Ordering'
-                    : type === 'dragdrop'       ? 'Drag & Drop'
+    // FillInBlank has three sub-shapes: text[] with numeric dropdowns (ordering),
+    // text[] with text dropdowns (match term→definition), and numbermatch (numeric answer).
+    const hasBlankText     = !!(q.fillincontent && Array.isArray(q.fillincontent.text));
+    const fibNumericOrder  = type === 'fillinblank' && hasBlankText && isNumericChoiceBlank(q);
+    const fibMatching      = type === 'fillinblank' && hasBlankText && !fibNumericOrder;
+    const typeLabel = type === 'multiplechoice'   ? 'Multiple Choice'
+                    : fibNumericOrder             ? 'Ordering'
+                    : fibMatching                 ? 'Matching'
+                    : type === 'fillinblank'      ? 'Fill in the Blank'
+                    : type === 'dragdrop'         ? 'Drag & Drop'
+                    : type === 'matchingactivity' ? 'Matching'
+                    : type === 'sequenceactivity' ? 'Sequence'
                     : q.type || 'Unknown';
 
     const el = document.createElement('div');
@@ -428,7 +479,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       });
       el.appendChild(optionsEl);
 
-    } else if (type === 'fillinblank') {
+    } else if (fibNumericOrder) {
       const steps = decodeOrdering(q);
       const ol = document.createElement('ol');
       ol.className = 'ordered-steps';
@@ -439,6 +490,48 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         ol.appendChild(li);
       });
       el.appendChild(ol);
+
+    } else if (fibMatching) {
+      const pairs = decodeTermDefinition(q);
+      const listEl = document.createElement('div');
+      listEl.className = 'match-list defs';
+      pairs.forEach(function (pair) {
+        searchText += ' ' + pair.term.toLowerCase() + ' ' + pair.def.toLowerCase();
+
+        const row = document.createElement('div');
+        row.className = 'match-row';
+
+        const leftEl = document.createElement('span');
+        leftEl.className = 'match-left';
+        leftEl.textContent = pair.term;
+
+        const arrowEl = document.createElement('span');
+        arrowEl.className = 'match-arrow';
+        arrowEl.textContent = '→';
+
+        const rightEl = document.createElement('span');
+        rightEl.className = 'match-right';
+        rightEl.textContent = pair.def;
+
+        row.appendChild(leftEl);
+        row.appendChild(arrowEl);
+        row.appendChild(rightEl);
+        listEl.appendChild(row);
+      });
+      el.appendChild(listEl);
+
+    } else if (type === 'fillinblank') {
+      const answers = decodeNumberMatch(q);
+      const wrap = document.createElement('div');
+      wrap.className = 'blank-answer-wrap';
+      answers.forEach(function (answer) {
+        searchText += ' ' + answer.toLowerCase();
+        const box = document.createElement('span');
+        box.className = 'blank-answer';
+        box.textContent = 'Answer: ' + answer;
+        wrap.appendChild(box);
+      });
+      el.appendChild(wrap);
 
     } else if (type === 'dragdrop') {
       const note = document.createElement('p');
@@ -467,9 +560,83 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         items.appendChild(chip);
       });
       el.appendChild(items);
+
+    } else if (type === 'matchingactivity') {
+      const listEl = document.createElement('div');
+      listEl.className = 'match-list';
+      const opts = Array.isArray(q.option) ? q.option : [];
+      opts.forEach(function (opt) {
+        const left  = stripXml(opt.distractor || '');
+        const right = stripXml((opt.match && opt.match.richtext) || '');
+        searchText += ' ' + left.toLowerCase() + ' ' + right.toLowerCase();
+
+        const row = document.createElement('div');
+        row.className = 'match-row';
+
+        const leftEl = document.createElement('span');
+        leftEl.className = 'match-left';
+        leftEl.textContent = left;
+
+        const arrowEl = document.createElement('span');
+        arrowEl.className = 'match-arrow';
+        arrowEl.textContent = '→';
+
+        const rightEl = document.createElement('span');
+        rightEl.className = 'match-right';
+        rightEl.textContent = right;
+
+        row.appendChild(leftEl);
+        row.appendChild(arrowEl);
+        row.appendChild(rightEl);
+        listEl.appendChild(row);
+      });
+      el.appendChild(listEl);
+
+    } else if (type === 'sequenceactivity') {
+      const steps = Array.isArray(q.sequencestep) ? q.sequencestep : (q.sequencestep ? [q.sequencestep] : []);
+      const ol = document.createElement('ol');
+      ol.className = 'ordered-steps';
+      steps.forEach(function (step) {
+        const text = stripXml((step && step.richtext) || '');
+        searchText += ' ' + text.toLowerCase();
+        const li = document.createElement('li');
+        li.textContent = text;
+        ol.appendChild(li);
+      });
+      el.appendChild(ol);
     }
 
     return { el: el, searchText: searchText };
+  }
+
+  // ── FillInBlank: are the dropdown choices numeric position labels? ──
+  // true  → real ordering question (choices are "1","2","3"…)
+  // false → match term→definition question (choices are full-text answers)
+  function isNumericChoiceBlank(q) {
+    const b      = q.fillincontent && q.fillincontent.blank;
+    const blanks = Array.isArray(b) ? b : (b ? [b] : []);
+    const ch     = blanks[0] && blanks[0].dropdownlist && blanks[0].dropdownlist.choice || [];
+    return ch.length > 0 && ch.every(function (c) { return /^\d+$/.test(String(c.text).trim()); });
+  }
+
+  // ── FillInBlank (match term→definition) decode ────────────────
+  // text[i] is the term; the correct definition is the choice flagged
+  // iscorrect:"true". Some source blanks omit the flag — fall back to the
+  // same-index choice (the diagonal), which matches how flagged blanks align.
+  function decodeTermDefinition(q) {
+    const fc     = q.fillincontent || {};
+    const texts  = Array.isArray(fc.text) ? fc.text : [];
+    const blanks = Array.isArray(fc.blank) ? fc.blank : (fc.blank ? [fc.blank] : []);
+    return texts.map(function (term, i) {
+      const blank   = blanks[i];
+      const choices = blank && blank.dropdownlist && blank.dropdownlist.choice || [];
+      const flagged = choices.find(function (c) { return c.iscorrect === 'true'; });
+      const answer  = flagged || choices[i] || choices[0];
+      return {
+        term: stripXml(term),
+        def:  stripXml(answer ? answer.text : '(answer not marked)')
+      };
+    });
   }
 
   // ── FillInBlank decode ────────────────────────────────────────
@@ -494,6 +661,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         ? q.fillincontent.text
         : ['(Could not decode ordering)'];
     }
+  }
+
+  // ── FillInBlank (numeric type-in-the-blank) decode ─────────────
+  function decodeNumberMatch(q) {
+    const blank  = q.fillincontent && q.fillincontent.blank;
+    const blanks = Array.isArray(blank) ? blank : (blank ? [blank] : []);
+    return blanks.map(function (b) {
+      const nm = b && b.numbermatch;
+      if (!nm) return '(no answer)';
+      return nm.min === nm.max ? nm.min : (nm.min + ' – ' + nm.max);
+    });
   }
 
   // ── search / filter ───────────────────────────────────────────
