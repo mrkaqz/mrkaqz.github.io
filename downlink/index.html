@@ -375,8 +375,8 @@
             min-height: 1.2em;
         }
 
-        /* PD MAP BUTTON */
-        #mapButton {
+        /* PD MAP + SETTINGS BUTTONS */
+        #mapButton, #configButton {
             background: none;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
@@ -389,11 +389,18 @@
             box-shadow: none;
             transition: border-color 0.2s, color 0.2s;
         }
-        #mapButton:hover {
+        #configButton {
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+            line-height: normal;
+            cursor: pointer;
+        }
+        #mapButton:hover, #configButton:hover {
             border-color: var(--accent-green);
             color: var(--accent-green);
         }
-        #mapButton:active {
+        #mapButton:active, #configButton:active {
             transform: scale(0.97);
         }
 
@@ -468,7 +475,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <header>
         <div class="theme-switch-wrapper">
-            <button id="mapButton" onclick="document.getElementById('mapModal').classList.add('open')" style="margin-right:12px">PD Map</button>
+            <button id="mapButton" onclick="document.getElementById('mapModal').classList.add('open')" style="margin-right:8px">PD Map</button>
+            <a id="configButton" href="config.html" style="margin-right:12px">&#9881; Beeps</a>
             <label class="theme-switch" for="checkbox">
                 <input type="checkbox" id="checkbox" />
                 <div class="slider">
@@ -602,10 +610,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </main>
 
     <footer>
-        <p>Simple Downlink v4.7.2 05-Jul-26 by https://ronnarong.dev</p>
+        <p>Simple Downlink v4.8 05-Sep-26 by https://ronnarong.dev</p>
     </footer>
 
     <script src="DLTime.js"></script>
+    <script src="config.js"></script>
     <script>
         // --- THEME LOGIC ---
         const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
@@ -648,10 +657,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         var beepSq = []; 
         
         var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        var beepFrequency = 1200; 
-        var shortBeepDuration = 200; 
-        var longBeepDuration = 800; 
-        
+        var shortBeepDuration = DL_BEEP_SHORT_MS;
+        var longBeepDuration = DL_BEEP_LONG_MS;
+
+        // User settings from config.html (localStorage). Refreshed on each Start
+        // so changes made in another tab take effect without a reload.
+        var beepConfig = dlLoadConfig();
+
         var endInterval = beepTimes[beepTimes.length - 1]*1000;
         var wakeLock = null; 
         
@@ -685,7 +697,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 audioContext.resume();
             }
 
-            if (document.getElementById("cmdSelect").value != "0-0") {  
+            // Pick up any edits made on the settings page since this page loaded
+            beepConfig = dlLoadConfig();
+
+            if (document.getElementById("cmdSelect").value != "0-0") {
                 startTime = Date.now() - elapsedTime;
                 lastProcessedSecond = -1; 
                 timerInterval = setInterval(updateTimer, 100); 
@@ -697,7 +712,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 document.getElementById("toolSelect").disabled = true;
                 document.getElementById("pageSelect").disabled = true;
                 
-                safePlayBeep(shortBeepDuration);
+                safePlayBeep(shortBeepDuration, beepConfig.freq.warn);
                 dotX = 0;
                 dotY = 20.5;
                 drawLine();
@@ -744,9 +759,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 var currentSeconds = Math.floor(elapsedTime / 1000);
                 
                 while (beepTimes.length > 0 && beepTimes[0] <= currentSeconds) {
-                    safePlayBeep(longBeepDuration); 
-                    toggle(); 
-                    beepTimes.shift(); 
+                    // toggle() runs after the beep, so the display still shows the
+                    // state we are leaving — that tells us which tone to play.
+                    var fallingEdge = stateText.innerHTML === "HIGH";
+                    safePlayBeep(longBeepDuration, fallingEdge ? beepConfig.freq.highToLow
+                                                              : beepConfig.freq.lowToHigh);
+                    toggle();
+                    beepTimes.shift();
                 }
 
                 if (currentSeconds > lastProcessedSecond) {
@@ -754,8 +773,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     if (beepTimes.length > 0) {
                         var nextTarget = beepTimes[0];
                         var diff = nextTarget - currentSeconds;
-                        if (diff <= 3 && diff > 0) {
-                            safePlayBeep(shortBeepDuration);
+                        if (diff <= dlLeadFor(beepConfig, bitPreiod) && diff > 0) {
+                            safePlayBeep(shortBeepDuration, beepConfig.freq.warn);
                         }
                         document.getElementById("countdown").textContent = diff + " sec";
                     }
@@ -777,19 +796,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             );
         }
 
-        function safePlayBeep(duration) {
-            try {
-                var oscillator = audioContext.createOscillator();
-                oscillator.frequency.value = beepFrequency;
-                oscillator.type = 'square'; 
-                oscillator.connect(audioContext.destination);
-                oscillator.start();
-                setTimeout(function() {
-                    oscillator.stop();
-                }, duration);
-            } catch (e) {
-                console.error("Audio play failed", e);
-            }
+        function safePlayBeep(duration, frequency) {
+            dlPlayTone(audioContext, frequency == null ? beepConfig.freq.warn : frequency, duration);
         }
 
         function updateStateDisplay(status) {

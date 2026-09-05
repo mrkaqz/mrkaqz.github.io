@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simple Downlink - Settings</title>
+    <link rel="manifest" href="manifest.json">
+
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5SKMH2TG');</script>
+    <!-- End Google Tag Manager -->
+
+    <style>
+        /* --- THEME VARIABLES (mirrors index.html) --- */
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --border-color: #333;
+            --input-bg: #2c2c2c;
+
+            --accent-green: #00e676;
+            --accent-orange: #ff9100;
+            --accent-blue: #2979ff;
+
+            --border-radius: 12px;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #555555;
+            --border-color: #ccc;
+            --input-bg: #f8f9fa;
+
+            --accent-green: #00c853;
+            --accent-orange: #ff6d00;
+            --accent-blue: #0050ef;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px 0 20px;
+            align-items: center;
+            flex-shrink: 0;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        #backButton {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 8px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        #backButton:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* THEME TOGGLE */
+        .theme-switch { display: inline-block; height: 34px; position: relative; width: 60px; }
+        .theme-switch input { display: none; }
+        .slider {
+            background-color: #ccc;
+            bottom: 0; left: 0; right: 0; top: 0;
+            cursor: pointer;
+            position: absolute;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px; left: 4px;
+            content: "";
+            height: 26px; width: 26px;
+            position: absolute;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        .slider-icon { position: absolute; top: 8px; width: 18px; height: 18px; transition: opacity 0.3s; }
+        .icon-sun { right: 8px; opacity: 1; color: #f39c12; }
+        .icon-moon { left: 8px; opacity: 0; color: #f1c40f; }
+        input:checked + .slider { background-color: var(--accent-blue); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        input:checked + .slider .icon-sun { opacity: 0; }
+        input:checked + .slider .icon-moon { opacity: 1; }
+
+        /* MAIN LAYOUT */
+        main {
+            display: flex;
+            flex-direction: column;
+            padding: 10px 20px 20px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            gap: 15px;
+        }
+
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 10px 0 0 0;
+            letter-spacing: -0.5px;
+        }
+
+        .page-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0 0 4px 0;
+            line-height: 1.6;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .section-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0 0 18px 0;
+        }
+
+        /* LEAD TIME ROWS */
+        .lead-row {
+            display: grid;
+            grid-template-columns: 1fr 130px;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 1px solid var(--border-color);
+        }
+        .lead-row:first-of-type { border-top: none; }
+
+        .row-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .row-sublabel {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            appearance: none;
+            transition: border-color 0.2s;
+        }
+        select { cursor: pointer; }
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        /* FREQUENCY ROWS */
+        .freq-row {
+            padding: 16px 0;
+            border-top: 1px solid var(--border-color);
+        }
+        .freq-row:first-of-type { border-top: none; padding-top: 0; }
+
+        .freq-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 12px;
+        }
+
+        .freq-readout {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            margin: 0 0 12px 0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            border: none;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            border: none;
+        }
+
+        .freq-actions {
+            display: grid;
+            grid-template-columns: 1fr 110px;
+            gap: 10px;
+        }
+
+        /* BUTTONS */
+        button {
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        button:active { transform: scale(0.98); }
+
+        .test-btn {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            font-size: 0.8rem;
+            border-radius: 8px;
+        }
+        .test-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        #saveButton {
+            background-color: var(--accent-green);
+            color: #000;
+            padding: 18px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
+        #resetButton {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+            padding: 18px;
+            font-size: 1.1rem;
+        }
+        #resetButton:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+
+        /* TOAST */
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translate(-50%, 20px);
+            background-color: var(--accent-green);
+            color: #000;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 300;
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5SKMH2TG"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <header>
+        <a id="backButton" href="./">&#8592; Back</a>
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider">
+                <svg class="slider-icon icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg class="slider-icon icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </div>
+        </label>
+    </header>
+
+    <main>
+
+        <h1>Beep Settings</h1>
+        <p class="page-hint">Saved on this device only &mdash; nothing is sent to the cloud.</p>
+
+        <!-- WARNING LEAD TIME -->
+        <div class="card">
+            <div class="section-title">Warning Lead Time</div>
+            <p class="section-hint">
+                How many seconds of countdown beeps play before each HIGH/LOW change.
+                Set independently for each bit period. Default is 3&nbsp;s.
+            </p>
+
+            <div class="lead-row">
+                <div>
+                    <div class="row-label">18s Bit Period</div>
+                    <div class="row-sublabel">Changes can be as little as 9&nbsp;s apart &mdash; a 9&ndash;10&nbsp;s lead beeps non-stop</div>
+                </div>
+                <select id="lead18" aria-label="Warning lead time for 18 second bit period"></select>
+            </div>
+
+            <div class="lead-row">
+                <div>
+                    <div class="row-label">36s Bit Period</div>
+                    <div class="row-sublabel">Changes at least 18&nbsp;s apart &mdash; any lead works</div>
+                </div>
+                <select id="lead36" aria-label="Warning lead time for 36 second bit period"></select>
+            </div>
+
+            <div class="lead-row">
+                <div>
+                    <div class="row-label">60s Bit Period</div>
+                    <div class="row-sublabel">Changes at least 30&nbsp;s apart &mdash; plenty of room for a long lead</div>
+                </div>
+                <select id="lead60" aria-label="Warning lead time for 60 second bit period"></select>
+            </div>
+        </div>
+
+        <!-- SOUND FREQUENCY -->
+        <div class="card">
+            <div class="section-title">Sound Frequency</div>
+            <p class="section-hint">
+                Pick a separate tone for each event so you can tell them apart without looking.
+                Range 200&ndash;4000&nbsp;Hz, default 1200&nbsp;Hz. Press <strong>Test</strong> to hear it.
+            </p>
+
+            <div class="freq-row">
+                <div class="freq-head">
+                    <div>
+                        <div class="row-label">Countdown Warning</div>
+                        <div class="row-sublabel">Short beeps leading up to a change</div>
+                    </div>
+                    <span class="freq-readout" id="warnReadout">1200 Hz</span>
+                </div>
+                <input type="range" id="warnRange" min="200" max="4000" step="10">
+                <div class="freq-actions">
+                    <input type="number" id="warnNumber" min="200" max="4000" step="10" aria-label="Countdown warning frequency in Hz">
+                    <button class="test-btn" data-test="warn">Test</button>
+                </div>
+            </div>
+
+            <div class="freq-row">
+                <div class="freq-head">
+                    <div>
+                        <div class="row-label">LOW &rarr; HIGH</div>
+                        <div class="row-sublabel">Long beep when the state rises</div>
+                    </div>
+                    <span class="freq-readout" id="lowToHighReadout">1200 Hz</span>
+                </div>
+                <input type="range" id="lowToHighRange" min="200" max="4000" step="10">
+                <div class="freq-actions">
+                    <input type="number" id="lowToHighNumber" min="200" max="4000" step="10" aria-label="Low to high frequency in Hz">
+                    <button class="test-btn" data-test="lowToHigh">Test</button>
+                </div>
+            </div>
+
+            <div class="freq-row">
+                <div class="freq-head">
+                    <div>
+                        <div class="row-label">HIGH &rarr; LOW</div>
+                        <div class="row-sublabel">Long beep when the state drops</div>
+                    </div>
+                    <span class="freq-readout" id="highToLowReadout">1200 Hz</span>
+                </div>
+                <input type="range" id="highToLowRange" min="200" max="4000" step="10">
+                <div class="freq-actions">
+                    <input type="number" id="highToLowNumber" min="200" max="4000" step="10" aria-label="High to low frequency in Hz">
+                    <button class="test-btn" data-test="highToLow">Test</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button id="saveButton">Save</button>
+            <button id="resetButton">Reset</button>
+        </div>
+
+    </main>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <footer>
+        <p>Simple Downlink &mdash; Settings</p>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+        // --- THEME (shared 'theme' key with the main app) ---
+        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme) {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            if (currentTheme === 'light') toggleSwitch.checked = true;
+        }
+
+        toggleSwitch.addEventListener('change', function (e) {
+            const theme = e.target.checked ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        });
+
+        // --- SETTINGS FORM ---
+        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        var config = dlLoadConfig();
+
+        var leadInputs = {
+            18: document.getElementById('lead18'),
+            36: document.getElementById('lead36'),
+            60: document.getElementById('lead60')
+        };
+
+        var freqInputs = {
+            warn:      { range: document.getElementById('warnRange'),      number: document.getElementById('warnNumber'),      readout: document.getElementById('warnReadout'),      duration: DL_BEEP_SHORT_MS },
+            lowToHigh: { range: document.getElementById('lowToHighRange'), number: document.getElementById('lowToHighNumber'), readout: document.getElementById('lowToHighReadout'), duration: DL_BEEP_LONG_MS },
+            highToLow: { range: document.getElementById('highToLowRange'), number: document.getElementById('highToLowNumber'), readout: document.getElementById('highToLowReadout'), duration: DL_BEEP_LONG_MS }
+        };
+
+        // Build the 3..10 second options once
+        DL_PERIODS.forEach(function (period) {
+            var select = leadInputs[period];
+            for (var s = DL_LIMITS.leadMin; s <= DL_LIMITS.leadMax; s++) {
+                var opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s + ' s';
+                select.appendChild(opt);
+            }
+        });
+
+        function renderConfig() {
+            DL_PERIODS.forEach(function (period) {
+                leadInputs[period].value = config.lead[period];
+            });
+
+            DL_FREQ_KEYS.forEach(function (key) {
+                var el = freqInputs[key];
+                el.range.value = config.freq[key];
+                el.number.value = config.freq[key];
+                el.readout.textContent = config.freq[key] + ' Hz';
+            });
+        }
+
+        function setFrequency(key, value) {
+            config.freq[key] = dlClamp(value, DL_LIMITS.freqMin, DL_LIMITS.freqMax, DL_DEFAULTS.freq[key]);
+            var el = freqInputs[key];
+            el.range.value = config.freq[key];
+            el.readout.textContent = config.freq[key] + ' Hz';
+        }
+
+        // Wire up lead time selects
+        DL_PERIODS.forEach(function (period) {
+            leadInputs[period].addEventListener('change', function (e) {
+                config.lead[period] = dlClamp(e.target.value, DL_LIMITS.leadMin, DL_LIMITS.leadMax, DL_DEFAULTS.lead[period]);
+            });
+        });
+
+        // Wire up frequency slider + number field (kept in sync both ways)
+        DL_FREQ_KEYS.forEach(function (key) {
+            var el = freqInputs[key];
+
+            el.range.addEventListener('input', function (e) {
+                setFrequency(key, e.target.value);
+                el.number.value = config.freq[key];
+            });
+
+            // Only normalise the number field on blur so typing isn't fought
+            el.number.addEventListener('input', function (e) {
+                var n = Number(e.target.value);
+                if (isFinite(n) && n >= DL_LIMITS.freqMin && n <= DL_LIMITS.freqMax) {
+                    setFrequency(key, n);
+                }
+            });
+            el.number.addEventListener('blur', function () {
+                el.number.value = config.freq[key];
+            });
+        });
+
+        // Test buttons
+        document.querySelectorAll('.test-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (audioContext.state === 'suspended') audioContext.resume();
+                var key = btn.getAttribute('data-test');
+                dlPlayTone(audioContext, config.freq[key], freqInputs[key].duration);
+            });
+        });
+
+        // Toast helper
+        var toastTimer;
+        function showToast(message, isWarning) {
+            var toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.backgroundColor = isWarning
+                ? getComputedStyle(document.documentElement).getPropertyValue('--accent-orange')
+                : getComputedStyle(document.documentElement).getPropertyValue('--accent-green');
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        document.getElementById('saveButton').addEventListener('click', function () {
+            if (dlSaveConfig(config)) {
+                showToast('Settings saved');
+            } else {
+                showToast('Could not save — storage blocked', true);
+            }
+        });
+
+        document.getElementById('resetButton').addEventListener('click', function () {
+            if (!confirm('Reset all beep settings back to 3 s lead and 1200 Hz tones?')) return;
+            config = dlResetConfig();
+            renderConfig();
+            showToast('Reset to defaults');
+        });
+
+        renderConfig();
+    </script>
+</body>
+</html>
