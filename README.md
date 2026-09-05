@@ -12,7 +12,7 @@ Personal site hosted on GitHub Pages at **[ronnarong.dev](https://www.ronnarong.
 | [LAS Analyzer](/las-analyzer/) | Browser-based tool for analyzing MWD/RSS drilling data from LAS 2.0 files. Drag-and-drop upload, outlier filtering, and interactive crossplot charts. | HTML · v2.1.0 |
 | [Landing Projection](/landing/) | Browser-based Minimum Curvature calculator for directional drilling surveys. Three-station output, live TD slider, dogleg severity indicators & dual units. | HTML · v1.1 |
 | [drillingDB](https://github.com/mrkaqz/drillingDB) | Local-network web app that digitises directional drilling motor output tracking. Batch import, cross-well analytics, BHA library & Excel export. | Python · FastAPI · v0.5 |
-| [Question Viewer](/question/) | Browser-based viewer for e-learning quiz exports. Load a local `questionData.js.download` file to browse all questions with correct answers highlighted. Supports multiple choice, ordering, and drag-and-drop types with live search. | HTML · v1.0 |
+| [Question Viewer](/question/) | Browser-based viewer for e-learning quiz exports. Load a local `questionData.js.download` file to browse all questions with correct answers highlighted. Supports multiple choice, ordering, and drag-and-drop types with live search. | HTML · v2.0 |
 
 ## Structure
 
