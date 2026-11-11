@@ -45,6 +45,15 @@
   }
   button.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
   button:hover { filter: brightness(1.1); }
+  .keep { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+  .keep-title { color: var(--text-muted); font-weight: 600; margin-right: 4px; }
+  #keepBoxes { display: contents; }
+  .keep label {
+    display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 999px; font-size: 13px;
+  }
+  .keep label:has(input:checked) { border-color: var(--accent); background: var(--surface2); }
+  .keep .count { color: var(--text-muted); font-variant-numeric: tabular-nums; }
   .filename { color: var(--text-muted); font-size: 12px; margin-left: auto; word-break: break-all; }
   .table-wrap { overflow: auto; max-height: 60vh; border: 1px solid var(--border); border-radius: 10px; }
   table { border-collapse: collapse; width: 100%; font-size: 12px; font-variant-numeric: tabular-nums; }
@@ -81,10 +90,14 @@
       <div class="stat"><div class="label">Rows in output</div><div class="value" id="nOut">0</div></div>
     </div>
 
+    <div class="keep">
+      <span class="keep-title">Keep:</span>
+      <span id="keepBoxes"></span>
+    </div>
+
     <div class="toolbar">
       <button id="download">Download DMAG.txt</button>
       <button id="copy" class="secondary">Copy to clipboard</button>
-      <label><input type="checkbox" id="keepOther"> Also keep non-rejected (Open) surveys</label>
       <label><input type="checkbox" id="showAll"> Show removed rows in preview</label>
       <span class="filename" id="fname"></span>
     </div>
@@ -119,7 +132,6 @@
     if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
   });
   file.addEventListener('change', () => { if (file.files[0]) load(file.files[0]); file.value = ''; });
-  $('keepOther').addEventListener('change', render);
   $('showAll').addEventListener('change', render);
 
   function load(f) {
@@ -148,15 +160,39 @@
     }
     $('fname').textContent = name;
     $('result').classList.remove('hidden');
+    buildKeepBoxes();
     render();
   }
 
+  let keepSet = new Set(['ACCEPTED']);
+
   function kept(r) {
-    if (r.status === 'ACCEPTED') return true;
-    if (r.status === 'REJECTED') return false;
     // header lines / unknown lines without a status are kept as-is
     if (!r.status) return true;
-    return $('keepOther').checked;
+    return keepSet.has(r.status);
+  }
+
+  function buildKeepBoxes() {
+    const counts = {};
+    rows.forEach(r => { if (r.status) counts[r.status] = (counts[r.status] || 0) + 1; });
+    const order = ['ACCEPTED', 'OPEN', 'REJECTED'];
+    const statuses = Object.keys(counts).sort((a, b) =>
+      ((order.indexOf(a) + 1) || 99) - ((order.indexOf(b) + 1) || 99) || a.localeCompare(b));
+    keepSet = new Set(statuses.filter(st => st === 'ACCEPTED'));
+    const box = $('keepBoxes');
+    box.innerHTML = '';
+    statuses.forEach(st => {
+      const cls = st === 'ACCEPTED' ? 'ok' : st === 'REJECTED' ? 'bad' : 'warn';
+      const label = document.createElement('label');
+      label.innerHTML = `<input type="checkbox" ${keepSet.has(st) ? 'checked' : ''}>` +
+        `<span class="${cls}">${esc(st.charAt(0) + st.slice(1).toLowerCase())}</span>` +
+        `<span class="count">(${counts[st]})</span>`;
+      label.querySelector('input').addEventListener('change', e => {
+        e.target.checked ? keepSet.add(st) : keepSet.delete(st);
+        render();
+      });
+      box.appendChild(label);
+    });
   }
 
   function render() {
