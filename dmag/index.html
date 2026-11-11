@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DMAG Survey Filter</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222535;
+    --border: #2e3247;
+    --accent: #4f8ef7;
+    --ok: #4fc97f;
+    --warn: #f7c84f;
+    --bad: #f74f7a;
+    --text: #e2e6f0;
+    --text-muted: #7b82a0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; }
+  .header h1 { font-size: 18px; font-weight: 600; }
+  .header .subtitle { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+  .upload-zone {
+    border: 2px dashed var(--border); border-radius: 12px; padding: 40px 24px; text-align: center;
+    cursor: pointer; background: var(--surface); transition: border-color .2s, background .2s;
+  }
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: var(--surface2); }
+  .upload-zone .big { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .upload-zone .small { color: var(--text-muted); font-size: 12px; }
+  input[type=file] { display: none; }
+  .hidden { display: none !important; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .stat .label { color: var(--text-muted); font-size: 12px; }
+  .stat .value { font-size: 24px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .ok { color: var(--ok); } .warn { color: var(--warn); } .bad { color: var(--bad); }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+  .toolbar label { display: flex; align-items: center; gap: 6px; color: var(--text-muted); cursor: pointer; }
+  button {
+    background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 10px 18px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  button.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  button:hover { filter: brightness(1.1); }
+  .filename { color: var(--text-muted); font-size: 12px; margin-left: auto; word-break: break-all; }
+  .table-wrap { overflow: auto; max-height: 60vh; border: 1px solid var(--border); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 12px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 6px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--border); }
+  th { position: sticky; top: 0; background: var(--surface2); color: var(--text-muted); font-weight: 600; }
+  td.s, th.s { text-align: left; }
+  tbody tr:nth-child(even) { background: var(--surface); }
+  tr.dim { opacity: .35; }
+  .error { background: #3a1a24; border: 1px solid var(--bad); color: var(--bad); padding: 12px; border-radius: 8px; margin-top: 16px; }
+  .note { color: var(--text-muted); font-size: 12px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>DMAG Survey Filter</h1>
+  <div class="subtitle">Upload a DMAG .txt file, drop rejected surveys, download only the accepted ones. Everything runs in your browser — nothing is uploaded.</div>
+</div>
+
+<main>
+  <div class="upload-zone" id="drop">
+    <div class="big">Drop DMAG file here or click to browse</div>
+    <div class="small">Tab-separated text, status in the last column (WDS_STATION_STATUS_…)</div>
+    <input type="file" id="file" accept=".txt,.csv,.tsv,text/plain">
+  </div>
+
+  <div id="err" class="error hidden"></div>
+
+  <section id="result" class="hidden">
+    <div class="stats">
+      <div class="stat"><div class="label">Total surveys</div><div class="value" id="nTotal">0</div></div>
+      <div class="stat"><div class="label">Accepted</div><div class="value ok" id="nAcc">0</div></div>
+      <div class="stat"><div class="label">Rejected</div><div class="value bad" id="nRej">0</div></div>
+      <div class="stat"><div class="label">Other (Open, etc.)</div><div class="value warn" id="nOther">0</div></div>
+      <div class="stat"><div class="label">Rows in output</div><div class="value" id="nOut">0</div></div>
+    </div>
+
+    <div class="toolbar">
+      <button id="download">Download DMAG.txt</button>
+      <button id="copy" class="secondary">Copy to clipboard</button>
+      <label><input type="checkbox" id="keepOther"> Also keep non-rejected (Open) surveys</label>
+      <label><input type="checkbox" id="showAll"> Show removed rows in preview</label>
+      <span class="filename" id="fname"></span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>MD</th><th>Inc</th><th>Azi</th>
+            <th>Gx</th><th>Gy</th><th>Gz</th><th>Bx</th><th>By</th><th>Bz</th>
+            <th class="s">Date</th><th class="s">Time</th><th class="s">Status</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="note">Output keeps the original lines exactly as they are (same columns, order and line endings) — only rejected rows are removed.</div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let rows = [], eol = '\n', outName = 'DMAG.txt';
+
+  const drop = $('drop'), file = $('file');
+  drop.addEventListener('click', () => file.click());
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('drag');
+    if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+  });
+  file.addEventListener('change', () => { if (file.files[0]) load(file.files[0]); file.value = ''; });
+  $('keepOther').addEventListener('change', render);
+  $('showAll').addEventListener('change', render);
+
+  function load(f) {
+    outName = 'DMAG.txt';
+    const reader = new FileReader();
+    reader.onload = () => parse(reader.result, f.name);
+    reader.readAsText(f);
+  }
+
+  function statusOf(line) {
+    const m = line.match(/WDS_STATION_STATUS_([A-Z_]+)\s*$/i);
+    return m ? m[1].toUpperCase() : null;
+  }
+
+  function parse(text, name) {
+    $('err').classList.add('hidden');
+    eol = text.includes('\r\n') ? '\r\n' : '\n';
+    const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+    rows = lines.map(line => ({ line, status: statusOf(line), cols: line.split('\t') }));
+    const known = rows.filter(r => r.status).length;
+    if (!known) {
+      $('result').classList.add('hidden');
+      $('err').textContent = 'No WDS_STATION_STATUS_… values found in this file. Is it a DMAG export?';
+      $('err').classList.remove('hidden');
+      return;
+    }
+    $('fname').textContent = name;
+    $('result').classList.remove('hidden');
+    render();
+  }
+
+  function kept(r) {
+    if (r.status === 'ACCEPTED') return true;
+    if (r.status === 'REJECTED') return false;
+    // header lines / unknown lines without a status are kept as-is
+    if (!r.status) return true;
+    return $('keepOther').checked;
+  }
+
+  function render() {
+    const acc = rows.filter(r => r.status === 'ACCEPTED').length;
+    const rej = rows.filter(r => r.status === 'REJECTED').length;
+    const other = rows.filter(r => r.status && r.status !== 'ACCEPTED' && r.status !== 'REJECTED').length;
+    const out = rows.filter(r => r.status && kept(r)).length;
+    $('nTotal').textContent = acc + rej + other;
+    $('nAcc').textContent = acc;
+    $('nRej').textContent = rej;
+    $('nOther').textContent = other;
+    $('nOut').textContent = out;
+
+    const showAll = $('showAll').checked;
+    const html = [];
+    rows.forEach((r, i) => {
+      if (!r.status) return;
+      const k = kept(r);
+      if (!k && !showAll) return;
+      const c = r.cols;
+      const n = c.length;
+      const cls = r.status === 'ACCEPTED' ? 'ok' : r.status === 'REJECTED' ? 'bad' : 'warn';
+      html.push(
+        `<tr class="${k ? '' : 'dim'}"><td>${i + 1}</td>` +
+        [1, 2, 3, 4, 5, 6, 7, 8, 9].map(j => `<td>${esc(c[j])}</td>`).join('') +
+        `<td class="s">${esc(c[n - 4])}</td><td class="s">${esc(c[n - 3])}</td>` +
+        `<td class="s ${cls}">${esc(r.status)}</td></tr>`);
+    });
+    $('tbody').innerHTML = html.join('');
+  }
+
+  function esc(s) {
+    return (s ?? '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+  }
+
+  function output() {
+    return rows.filter(kept).map(r => r.line).join(eol) + eol;
+  }
+
+  $('download').addEventListener('click', () => {
+    const blob = new Blob([output()], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = outName;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  $('copy').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(output());
+      const b = $('copy'), t = b.textContent;
+      b.textContent = 'Copied!'; setTimeout(() => b.textContent = t, 1500);
+    } catch { alert('Clipboard not available in this browser.'); }
+  });
+})();
+</script>
+</body>
+</html>
